@@ -121,10 +121,17 @@
             0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
             50% { text-shadow: 0 0 30px rgba(255,255,255,0.9), 0 0 15px #FF7E05; }
         }
+        @keyframes zoomInElastic {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         .anim-element { opacity: 0; }
         .scene.active .anim-fade-up { animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .scene.active .anim-tracking { animation: trackingIn 1.2s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
+        .scene.active .anim-zoom-in { animation: zoomInElastic 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
         
         /* Delays */
         .scene.active .delay-1 { animation-delay: 0.3s; }
@@ -137,7 +144,7 @@
         .avatar-img { object-fit: cover; object-position: center; }
     </style>
 </head>
-<body class="antialiased font-sans cursor-pointer" onclick="nextScene(event)">
+<body class="antialiased font-sans">
 
     <!-- CONTEINER 16:9 ESTrito -->
     <div class="viewport-16-9">
@@ -151,38 +158,32 @@
             <i class="fa-solid fa-lightbulb absolute top-[45%] left-[5%] text-7xl text-white animate-spin-slow"></i>
         </div>
 
-        <!-- ÁREA DE CONTROLO INVISÍVEL (Só aparece passando o rato no fundo do ecrã) -->
-        <div class="absolute bottom-0 left-0 w-full h-24 z-[60] flex items-end justify-center pb-4 gap-6 opacity-0 hover:opacity-100 transition-opacity duration-300">
-            <button onclick="prevScene(event)" class="w-12 h-12 bg-black/50 hover:bg-brisa-orange border border-white/20 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-xl hover:scale-110" title="Cena Anterior">
-                <i class="fa-solid fa-chevron-left text-xl pr-1"></i>
-            </button>
-            <div class="bg-black/50 border border-white/20 px-6 py-2 rounded-full backdrop-blur-md flex items-center gap-3 shadow-xl pointer-events-none">
-                <i class="fa-solid fa-mouse-pointer text-white/70"></i>
-                <span class="text-white font-bold tracking-widest uppercase text-sm" id="scene-counter">1/10</span>
-            </div>
-            <button onclick="nextScene(event)" class="w-12 h-12 bg-black/50 hover:bg-brisa-orange border border-white/20 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-xl hover:scale-110" title="Próxima Cena">
-                <i class="fa-solid fa-chevron-right text-xl pl-1"></i>
-            </button>
+        <!-- ÁREA DE CONTROLO INVISÍVEL (Estratégico para a Live) -->
+        <!-- Clique nos 15% esquerdos da tela para VOLTAR -->
+        <!-- Clique nos 85% direitos da tela para AVANÇAR -->
+        <div class="absolute inset-0 z-[60] flex pointer-events-none">
+            <div onclick="prevScene(event)" class="w-[15%] h-full pointer-events-auto cursor-pointer" title="Cena Anterior"></div>
+            <div onclick="nextScene(event)" class="w-[85%] h-full pointer-events-auto cursor-pointer" title="Próxima Cena"></div>
         </div>
 
         <!-- ==========================================
-             CENA 0: INÍCIO
+             CENA 0: INÍCIO (Nova versão assertiva)
         =========================================== -->
         <div id="scene-0" class="scene active text-center px-4">
-            <!-- LOGO BRISACAST -->
-            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-32 md:h-48 mb-8 object-contain anim-element anim-fade-up drop-shadow-2xl mx-auto">
+            <!-- LOGO BRISACAST com animação de impacto -->
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-40 md:h-52 mb-8 object-contain anim-element anim-zoom-in drop-shadow-2xl mx-auto">
             
-            <h1 class="font-heading font-extrabold text-6xl md:text-7xl tracking-tight mb-4 text-white uppercase anim-element anim-tracking delay-1 glow-text drop-shadow-lg">
-                Começaremos em Instantes
+            <h1 class="font-heading font-extrabold text-6xl md:text-8xl tracking-tight mb-4 text-white uppercase anim-element anim-tracking delay-1 glow-text drop-shadow-xl">
+                O Futuro é Agora
             </h1>
             
-            <p class="text-3xl font-bold bg-white/20 border border-white/50 px-10 py-4 rounded-full shadow-2xl backdrop-blur-md inline-block mt-4 anim-element anim-fade-up delay-2">
-                Acomode-se e prepare-se para a <span class="font-extrabold text-white drop-shadow-md">Positivação Unibrisa 2026</span>
+            <p class="text-3xl md:text-4xl font-bold bg-white/20 border border-white/50 px-12 py-5 rounded-full shadow-2xl backdrop-blur-md inline-block mt-4 anim-element anim-fade-up delay-2">
+                Bem-vindos à <span class="font-extrabold text-white drop-shadow-md">Positivação Unibrisa 2026</span>
             </p>
 
-            <div class="mt-16 anim-element anim-fade-up delay-3 bg-white/10 px-6 py-3 rounded-full backdrop-blur-md border border-white/30 inline-flex items-center gap-4 shadow-lg">
-                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-white"></i>
-                <p class="text-lg font-bold tracking-[0.2em] uppercase opacity-90">Ajustando as conexões...</p>
+            <div class="mt-16 anim-element anim-fade-up delay-3 bg-brisa-blue/90 px-8 py-4 rounded-full backdrop-blur-md border border-white/30 inline-flex items-center gap-4 shadow-xl animate-pulse-slow">
+                <i class="fa-solid fa-satellite-dish text-3xl text-white"></i>
+                <p class="text-xl font-bold tracking-[0.2em] uppercase opacity-100">A transmissão iniciará em breve</p>
             </div>
         </div>
 
@@ -445,15 +446,15 @@
         </div>
 
         <!-- ==========================================
-             CENA 9: ENCERRAMENTO
+             CENA 9: ENCERRAMENTO (Q&A Diretoria)
         =========================================== -->
         <div id="scene-9" class="scene px-4 w-full text-center">
             
             <div class="mb-10 anim-element anim-fade-up flex flex-col items-center">
                 <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-4 object-contain drop-shadow-lg">
-                <span class="bg-brisa-blue border border-white/20 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-lg uppercase tracking-wider inline-block">16:50 - 17:00</span>
-                <h2 class="font-heading font-extrabold text-7xl mt-6 mb-2 drop-shadow-md uppercase anim-element anim-tracking delay-1 glow-text">Missão Cumprida!</h2>
-                <p class="text-3xl font-bold drop-shadow opacity-90 mt-4 anim-element anim-fade-up delay-2">Obrigado por fazer parte deste dia incrível de imersão e aprendizado.</p>
+                <span class="bg-brisa-blue border border-white/20 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-lg uppercase tracking-wider inline-block">Momento Q&A</span>
+                <h2 class="font-heading font-extrabold text-7xl mt-6 mb-2 drop-shadow-md uppercase anim-element anim-tracking delay-1 glow-text">Converse com nossos Diretores</h2>
+                <p class="text-3xl font-bold drop-shadow opacity-90 mt-4 anim-element anim-fade-up delay-2">Espaço aberto para perguntas, ideias e alinhamento estratégico.</p>
             </div>
             
             <div class="flex flex-wrap justify-center items-stretch gap-6 max-w-7xl mx-auto mb-12 anim-element anim-fade-up delay-3 scale-110 mt-10">
@@ -462,21 +463,21 @@
                         <img src="https://media.licdn.com/dms/image/v2/D4D03AQF2ASTDePwLiQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1695233276678?e=1774483200&v=beta&t=9z1_CWHjAT_m7KAsIBWUXoEBmXGqke33WoFTEcer6mU" class="w-20 h-20 rounded-full border-4 border-white mb-3 avatar-img shadow-lg mx-auto">
                         <h3 class="text-base font-bold leading-tight mb-3">Roberto<br>Nogueira</h3>
                     </div>
-                    <span class="bg-white/20 border border-white/30 text-white font-extrabold px-2 py-1.5 rounded-full text-[10px] shadow-sm uppercase tracking-widest w-full">Convidado</span>
+                    <span class="bg-white/20 border border-white/30 text-white font-extrabold px-2 py-1.5 rounded-full text-[10px] shadow-sm uppercase tracking-widest w-full">Diretoria</span>
                 </div>
                 <div class="glass-card p-5 w-40 flex flex-col items-center text-center justify-between h-full">
                     <div class="w-full">
                         <img src="https://media.licdn.com/dms/image/v2/D4D03AQGtIcmAmTTreQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1722284494780?e=1774483200&v=beta&t=r6Kk1rce6LSrWI6Jqac2JqKzlUOxbknRuQ4pP_V9ZJI" class="w-20 h-20 rounded-full border-4 border-white mb-3 avatar-img shadow-lg mx-auto">
                         <h3 class="text-base font-bold leading-tight mb-3">Jordão<br>Estevam</h3>
                     </div>
-                    <span class="bg-white/20 border border-white/30 text-white font-extrabold px-2 py-1.5 rounded-full text-[10px] shadow-sm uppercase tracking-widest w-full">Convidado</span>
+                    <span class="bg-white/20 border border-white/30 text-white font-extrabold px-2 py-1.5 rounded-full text-[10px] shadow-sm uppercase tracking-widest w-full">Diretoria</span>
                 </div>
                 <div class="glass-card p-5 w-40 flex flex-col items-center text-center justify-between h-full">
                     <div class="w-full">
                         <img src="https://media.licdn.com/dms/image/v2/D4D03AQH_9IWtfo86wQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706018736673?e=1774483200&v=beta&t=Fmc-dbzm9VPrs3UFaC1qOf8oCeewYfiaN4Qk8HNRAuA" class="w-20 h-20 rounded-full border-4 border-white mb-3 avatar-img shadow-lg mx-auto">
                         <h3 class="text-base font-bold leading-tight mb-3">João P.<br>Estevam</h3>
                     </div>
-                    <span class="bg-white/20 border border-white/30 text-white font-extrabold px-2 py-1.5 rounded-full text-[10px] shadow-sm uppercase tracking-widest w-full">Convidado</span>
+                    <span class="bg-white/20 border border-white/30 text-white font-extrabold px-2 py-1.5 rounded-full text-[10px] shadow-sm uppercase tracking-widest w-full">Diretoria</span>
                 </div>
                 <div class="glass-card p-5 w-40 flex flex-col items-center text-center justify-between h-full">
                     <div class="w-full">
@@ -495,7 +496,7 @@
             </div>
             
             <p class="text-center text-2xl font-bold bg-white/20 border border-white/40 px-10 py-4 rounded-full shadow-2xl backdrop-blur-md inline-block mt-4 anim-element anim-fade-up delay-4">
-                <i class="fa-brands fa-instagram mr-2"></i> O conhecimento continua. Poste com <span class="font-black ml-1 text-white drop-shadow">#ConectadosPeloAprendizado</span>
+                <i class="fa-brands fa-instagram mr-2"></i> Prepare suas dúvidas e participe! <span class="font-black ml-1 text-white drop-shadow">#PositividadeUnibrisa</span>
             </p>
         </div>
 
@@ -506,10 +507,6 @@
         let currentScene = 0;
         const totalScenes = 10; 
 
-        function updateCounter() {
-            document.getElementById('scene-counter').innerText = `${currentScene + 1}/${totalScenes}`;
-        }
-
         function showScene(index) {
             document.querySelectorAll('.scene').forEach(scene => {
                 scene.classList.remove('active');
@@ -518,7 +515,6 @@
             setTimeout(() => {
                 document.getElementById(`scene-${index}`).classList.add('active');
             }, 50);
-            updateCounter();
         }
 
         function nextScene(e) {
@@ -540,8 +536,6 @@
                 prevScene();
             }
         });
-
-        updateCounter();
     </script>
 </body>
 </html>
