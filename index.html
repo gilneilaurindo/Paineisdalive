@@ -500,12 +500,19 @@
             </p>
         </div>
 
+        <!-- ==========================================
+             CENA 10: TELA COM LOGO E MÚSICA DE FUNDO
+        =========================================== -->
+        <div id="scene-10" class="scene px-4 w-full text-center">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="absolute top-16 md:top-24 h-48 md:h-64 object-contain anim-element anim-zoom-in animate-pulse-slow drop-shadow-[0_0_40px_rgba(255,255,255,0.8)] mx-auto">
+        </div>
+
     </div> <!-- FIM DO CONTEINER 16:9 -->
 
     <!-- Script de Gestão das Cenas -->
     <script>
         let currentScene = 0;
-        const totalScenes = 10; 
+        const totalScenes = 11; 
 
         function showScene(index) {
             document.querySelectorAll('.scene').forEach(scene => {
