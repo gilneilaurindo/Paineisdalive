@@ -1,1 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telas Animadas 16:9 - Live Unibrisa</title>
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brisa: { orange: '#FF7E05', blue: '#2242D4', dark: '#1A34A8' }
+                    },
+                    fontFamily: { sans: ['Figtree', 'sans-serif'], heading: ['Figtree', 'sans-serif'] },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin-slow 15s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'spin-slow': {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            background-color: #FF7E05; 
+            color: white; 
+            overflow: hidden; 
+            margin: 0; 
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* O SEGREDO DO 16:9 + Imagem de Fundo Oficial Original */
+        .viewport-16-9 {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw; 
+            max-height: 100vh;
+            max-width: 177.77vh; 
+            overflow: hidden;
+            background-image: url('https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Plano%20de%20fundo.png');
+            background-size: cover;
+            background-position: center;
+            background-color: #FF7E05;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* Sobreposição clara original */
+        .pattern-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
+            background-size: 30px 30px;
+            z-index: 0;
+        }
+
+        /* O Cartão Central (Novo Layout baseado nas imagens) */
+        .central-card {
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 2rem; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Borda de Destaque lateral dependendo do tipo de painel */
+        .border-accent-blue { border-left: 10px solid #2242D4; }
+        .border-accent-orange { border-left: 10px solid #FF7E05; }
+
+        /* Gestão de Cenas */
+        .scene {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; z-index: 10;
+            transition: opacity 0.6s ease-in-out, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0.97);
+        }
+        .scene.active { 
+            opacity: 1; pointer-events: auto; transform: scale(1); 
+        }
+
+        /* --- ANIMAÇÕES DE TEXTO AVANÇADAS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes trackingIn {
+            0% { letter-spacing: -0.5em; opacity: 0; filter: blur(10px); transform: scale(0.9); }
+            40% { opacity: 0.6; filter: blur(2px); }
+            100% { letter-spacing: normal; opacity: 1; filter: blur(0); transform: scale(1); }
+        }
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+            50% { text-shadow: 0 0 30px rgba(255,255,255,0.9), 0 0 15px #FF7E05; }
+        }
+
+        .anim-element { opacity: 0; }
+        .scene.active .anim-fade-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .scene.active .anim-tracking { animation: trackingIn 1.2s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
+        
+        .scene.active .delay-1 { animation-delay: 0.2s; }
+        .scene.active .delay-2 { animation-delay: 0.4s; }
+        .scene.active .delay-3 { animation-delay: 0.6s; }
+        
+        .glow-text { animation: glowPulse 3s infinite; }
+        .avatar-img { object-fit: cover; object-position: center; }
+    </style>
+</head>
+<body class="antialiased font-sans cursor-pointer" onclick="nextScene(event)">
+
+    <!-- CONTEINER 16:9 ESTrito -->
+    <div class="viewport-16-9">
+        
+        <div class="pattern-overlay"></div>
+
+        <!-- Fundo flutuante decorativo -->
+        <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
+            <i class="fa-solid fa-graduation-cap absolute top-[15%] left-[10%] text-8xl text-white animate-float"></i>
+            <i class="fa-solid fa-microchip absolute bottom-[20%] right-[10%] text-9xl text-white animate-float-delayed"></i>
+            <i class="fa-solid fa-lightbulb absolute top-[45%] left-[5%] text-7xl text-white animate-spin-slow"></i>
+        </div>
+
+        <!-- ÁREA DE CONTROLO INVISÍVEL (Só aparece passando o rato no fundo do ecrã) -->
+        <div class="absolute bottom-0 left-0 w-full h-24 z-[60] flex items-end justify-center pb-4 gap-6 opacity-0 hover:opacity-100 transition-opacity duration-300">
+            <button onclick="prevScene(event)" class="w-12 h-12 bg-black/50 hover:bg-brisa-orange border border-white/20 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-xl hover:scale-110" title="Cena Anterior">
+                <i class="fa-solid fa-chevron-left text-xl pr-1"></i>
+            </button>
+            <div class="bg-black/50 border border-white/20 px-6 py-2 rounded-full backdrop-blur-md flex items-center gap-3 shadow-xl pointer-events-none">
+                <i class="fa-solid fa-mouse-pointer text-white/70"></i>
+                <span class="text-white font-bold tracking-widest uppercase text-sm" id="scene-counter">1/10</span>
+            </div>
+            <button onclick="nextScene(event)" class="w-12 h-12 bg-black/50 hover:bg-brisa-orange border border-white/20 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-xl hover:scale-110" title="Próxima Cena">
+                <i class="fa-solid fa-chevron-right text-xl pl-1"></i>
+            </button>
+        </div>
+
+        <!-- ==========================================
+             CENA 0: INÍCIO
+        =========================================== -->
+        <div id="scene-0" class="scene active text-center px-4">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-32 md:h-48 mb-8 object-contain anim-element anim-fade-up drop-shadow-2xl mx-auto">
+            
+            <h1 class="font-heading font-extrabold text-6xl md:text-7xl tracking-tight mb-4 text-white uppercase anim-element anim-tracking delay-1 glow-text drop-shadow-lg">
+                Começaremos em Instantes
+            </h1>
+            
+            <p class="text-3xl font-bold bg-white/20 border border-white/50 px-10 py-4 rounded-full shadow-2xl backdrop-blur-md inline-block mt-4 anim-element anim-fade-up delay-2">
+                Acomode-se e prepare-se para a <span class="font-extrabold text-white drop-shadow-md">Positivação Unibrisa 2026</span>
+            </p>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 1: Abertura & Visão Estratégica
+        =========================================== -->
+        <div id="scene-1" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-blue max-w-5xl w-full p-10 md:p-12 anim-element anim-fade-up delay-1 text-left">
+                <!-- Cabeçalho do Cartão -->
+                <div class="flex justify-between items-start mb-6">
+                    <div class="max-w-3xl">
+                        <h2 class="font-heading font-extrabold text-5xl mb-4 drop-shadow-md leading-tight">Abertura & Visão Estratégica</h2>
+                        <p class="text-2xl font-medium opacity-90 drop-shadow leading-snug">Abertura com o MVV | Linha do tempo da "Unibrisa" e a visão de ecossistema de aprendizagem.<br><i class="fa-solid fa-location-dot mt-2 mr-2"></i> Auditório [Sede] & Transmissão Regionais</p>
+                    </div>
+                    <span class="border-2 border-white/60 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-sm whitespace-nowrap">09:00 a 09:30</span>
+                </div>
+
+                <hr class="border-white/30 my-8">
+
+                <!-- Convidados -->
+                <div>
+                    <h3 class="text-sm font-extrabold uppercase tracking-widest mb-6 opacity-90">Convidados & Facilitação</h3>
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <!-- Facilitadores (Fundo Preenchido) -->
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Valcerlan Almeida</span>
+                        </div>
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Flavia Paulino</span>
+                        </div>
+                        <!-- Convidados (Borda) -->
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQG5zHuPAI-aHQ/profile-displayphoto-shrink_400_400/B4DZYs27riG8Ak-/0/1744509320388?e=1774483200&v=beta&t=OjdwKDgELKRftI9ZZ8AOo0klRinG59y7uH6kqziF59Q" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">Daiane Borges</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQEJiVRYBBOftA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1710777328302?e=1774483200&v=beta&t=LG1Jgmb3yfkT8T3GbTVw01vV8okUwdonWltE52AEbHQ" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">Simone Caixeta</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/C4D03AQEdvIb2yYv5kQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1626027937696?e=1774483200&v=beta&t=4_fy4ifGuMcvSQe5XLHgr0C1OH133ObJdqiWX6JdsEU" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">Leandro Chalegra</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGWQ9NhOj2mZQ/profile-displayphoto-scale_400_400/B4DZjRym2tGgAk-/0/1755866362712?e=1774483200&v=beta&t=y6ikDOIH7XxE33hBY0fgzkb0SqjfEjGKu97K2rF2obo" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">Airton</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 2: Painel 01 (Cibersegurança)
+        =========================================== -->
+        <div id="scene-2" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-blue max-w-5xl w-full p-10 md:p-12 anim-element anim-fade-up delay-1 text-left">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="max-w-3xl">
+                        <h2 class="font-heading font-extrabold text-5xl mb-4 drop-shadow-md leading-tight">Painel 01: Cibersegurança no Grupo Brisanet</h2>
+                    </div>
+                    <span class="border-2 border-white/60 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-sm whitespace-nowrap">09:30 a 10:30</span>
+                </div>
+
+                <hr class="border-white/30 my-8">
+
+                <div>
+                    <h3 class="text-sm font-extrabold uppercase tracking-widest mb-6 opacity-90">Convidados & Facilitação</h3>
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Valcerlan Almeida</span>
+                        </div>
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Flavia Paulino</span>
+                        </div>
+                        <!-- Sem foto (usa ícone padrão) -->
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">Lucas Kennedy</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">William Heller</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 3: Painel 02 (Compliance)
+        =========================================== -->
+        <div id="scene-3" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-blue max-w-5xl w-full p-10 md:p-12 anim-element anim-fade-up delay-1 text-left">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="max-w-3xl">
+                        <h2 class="font-heading font-extrabold text-5xl mb-4 drop-shadow-md leading-tight">Painel 02: Compliance + Código de Ética de Bolso</h2>
+                    </div>
+                    <span class="border-2 border-white/60 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-sm whitespace-nowrap">10:30 a 12:00</span>
+                </div>
+
+                <hr class="border-white/30 my-8">
+
+                <div>
+                    <h3 class="text-sm font-extrabold uppercase tracking-widest mb-6 opacity-90">Convidados & Facilitação</h3>
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Valcerlan Almeida</span>
+                        </div>
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Flavia Paulino</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQFIKz7KHsJb5Q/profile-displayphoto-shrink_100_100/B4DZdfQ3PDG8AU-/0/1749649946241?e=1774483200&v=beta&t=GcA4xKs-7bPxbC0_GroBDp1LQxsh2ygbImlMqdKTR-8" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">David Barreto</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQECBC4zx8qwxg/profile-displayphoto-shrink_400_400/B4DZdfQIcyGYAk-/0/1749649754809?e=1774483200&v=beta&t=u6qSWIWaINt8l40BFz8wBrEJky4It0J2YrMf6ZOIlxs" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">Juliana Fernandes</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">Luciana Paulo</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">João Paulo Araújo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 4: ALMOÇO (Cartão Azul)
+        =========================================== -->
+        <div id="scene-4" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-blue max-w-4xl w-full p-10 md:p-14 anim-element anim-fade-up delay-1 text-left relative">
+                <span class="bg-brisa-blue text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-md whitespace-nowrap inline-block mb-8">12:00 a 13:30</span>
+                
+                <h2 class="font-heading font-extrabold text-6xl mb-6 drop-shadow-md flex items-center gap-6">
+                    <i class="fa-solid fa-utensils opacity-80"></i> Almoço & Área Vivencial
+                </h2>
+                
+                <p class="text-3xl font-medium opacity-90 drop-shadow-sm leading-relaxed">
+                    Participe das ações e dinâmicas na área vivencial como a Blitz de segurança e nossos Jogos interativos!
+                </p>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 5: Painel 03 (Google Cloud)
+        =========================================== -->
+        <div id="scene-5" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-blue max-w-5xl w-full p-10 md:p-12 anim-element anim-fade-up delay-1 text-left">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="max-w-3xl">
+                        <h2 class="font-heading font-extrabold text-5xl mb-4 drop-shadow-md leading-tight">Painel 03: Google Cloud <i class="fa-brands fa-google ml-2"></i></h2>
+                        <p class="text-2xl font-medium opacity-90 drop-shadow leading-snug">"Prompt de produtividade com Gemini para Workspace"</p>
+                    </div>
+                    <span class="border-2 border-white/60 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-sm whitespace-nowrap">13:30 a 14:30</span>
+                </div>
+
+                <hr class="border-white/30 my-8">
+
+                <div>
+                    <h3 class="text-sm font-extrabold uppercase tracking-widest mb-6 opacity-90">Convidados & Facilitação</h3>
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Valcerlan Almeida</span>
+                        </div>
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Flavia Paulino</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">Natan Valenciano</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">Igor Carolino</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 6: PAUSA PARA O CAFÉ
+        =========================================== -->
+        <div id="scene-6" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-blue max-w-4xl w-full p-10 md:p-14 anim-element anim-fade-up delay-1 text-left relative">
+                <span class="bg-brisa-blue text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-md whitespace-nowrap inline-block mb-8">14:30 a 15:00</span>
+                
+                <h2 class="font-heading font-extrabold text-6xl mb-6 drop-shadow-md flex items-center gap-6">
+                    <i class="fa-solid fa-mug-hot opacity-90"></i> Pausa para o Café
+                </h2>
+                
+                <p class="text-3xl font-medium opacity-90 drop-shadow-sm leading-relaxed">
+                    Ações e dinâmicas na área vivencial como Blitz de segurança + Jogos interativos continuam.
+                </p>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 7: Painel 04 (Educação Financeira)
+        =========================================== -->
+        <div id="scene-7" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-orange max-w-5xl w-full p-10 md:p-12 anim-element anim-fade-up delay-1 text-left">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="max-w-3xl">
+                        <h2 class="font-heading font-extrabold text-5xl mb-4 drop-shadow-md leading-tight">Painel 04: Educação Financeira</h2>
+                    </div>
+                    <span class="border-2 border-white/60 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-sm whitespace-nowrap">15:00 a 16:30</span>
+                </div>
+
+                <hr class="border-white/30 my-8">
+
+                <div>
+                    <h3 class="text-sm font-extrabold uppercase tracking-widest mb-6 opacity-90 text-right">Convidados & Facilitação</h3>
+                    <div class="flex flex-wrap gap-4 items-center justify-end">
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Valcerlan Almeida</span>
+                        </div>
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Flavia Paulino</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">Ângelo Pessoa</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-user text-xl"></i></div>
+                            <span class="font-bold text-xl">Romário Aquino</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MOMENTO 8: RESULTADOS DOS QUIZZES
+        =========================================== -->
+        <div id="scene-8" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-blue max-w-4xl w-full p-10 md:p-14 anim-element anim-fade-up delay-1 text-left relative">
+                <span class="border-2 border-white/60 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-sm whitespace-nowrap inline-block mb-8">16:30 a 16:50</span>
+                
+                <h2 class="font-heading font-extrabold text-6xl mb-6 drop-shadow-md flex items-center gap-6">
+                    <i class="fa-solid fa-chart-simple opacity-90 relative"><i class="fa-solid fa-star absolute -top-4 -right-4 text-2xl text-white"></i></i> Resultados dos Quizzes
+                </h2>
+                
+                <p class="text-3xl font-medium opacity-90 drop-shadow-sm leading-relaxed">
+                    Anúncio oficial da realização e dos grandes resultados do dia.
+                </p>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             CENA 9: ENCERRAMENTO OFICIAL
+        =========================================== -->
+        <div id="scene-9" class="scene px-8 w-full">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-16 mb-8 object-contain drop-shadow-lg anim-element anim-fade-up">
+            
+            <div class="central-card border-accent-orange max-w-5xl w-full p-10 md:p-12 anim-element anim-fade-up delay-1 text-left">
+                <div class="flex justify-end items-start mb-6">
+                    <span class="border-2 border-white/60 text-white font-extrabold px-6 py-2 rounded-full text-xl shadow-sm whitespace-nowrap">16:50 a 17:00</span>
+                </div>
+                
+                <h2 class="font-heading font-extrabold text-6xl mb-6 drop-shadow-md text-right">Encerramento Oficial</h2>
+
+                <hr class="border-white/30 my-8">
+
+                <div>
+                    <h3 class="text-sm font-extrabold uppercase tracking-widest mb-6 opacity-90 text-right">Convidados & Facilitação</h3>
+                    <div class="flex flex-wrap gap-4 items-center justify-end">
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Valcerlan Almeida</span>
+                        </div>
+                        <div class="bg-black/30 border border-transparent rounded-full flex items-center pr-6 p-1.5 gap-4 shadow-md">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-extrabold text-xl">Flavia Paulino</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQF2ASTDePwLiQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1695233276678?e=1774483200&v=beta&t=9z1_CWHjAT_m7KAsIBWUXoEBmXGqke33WoFTEcer6mU" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">Roberto Nogueira</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGtIcmAmTTreQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1722284494780?e=1774483200&v=beta&t=r6Kk1rce6LSrWI6Jqac2JqKzlUOxbknRuQ4pP_V9ZJI" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">Jordão Estevam</span>
+                        </div>
+                        <div class="bg-transparent border-2 border-white/40 rounded-full flex items-center pr-6 p-1.5 gap-4">
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQH_9IWtfo86wQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706018736673?e=1774483200&v=beta&t=Fmc-dbzm9VPrs3UFaC1qOf8oCeewYfiaN4Qk8HNRAuA" class="w-12 h-12 rounded-full avatar-img">
+                            <span class="font-bold text-xl">João P. Estevam</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- FIM DO CONTEINER 16:9 -->
+
+    <!-- Script de Gestão das Cenas -->
+    <script>
+        let currentScene = 0;
+        const totalScenes = 10; 
+
+        function updateCounter() {
+            document.getElementById('scene-counter').innerText = `${currentScene + 1}/${totalScenes}`;
+        }
+
+        function showScene(index) {
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+            // O delay pequeno permite que o CSS "reinicie" a animação
+            setTimeout(() => {
+                document.getElementById(`scene-${index}`).classList.add('active');
+            }, 50);
+            updateCounter();
+        }
+
+        function nextScene(e) {
+            if(e) e.stopPropagation();
+            currentScene = (currentScene + 1) % totalScenes;
+            showScene(currentScene);
+        }
+
+        function prevScene(e) {
+            if(e) e.stopPropagation();
+            currentScene = (currentScene - 1 + totalScenes) % totalScenes;
+            showScene(currentScene);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                nextScene();
+            } else if (e.key === 'ArrowLeft') {
+                prevScene();
+            }
+        });
+
+        updateCounter();
+    </script>
+</body>
+</html>
