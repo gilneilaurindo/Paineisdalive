@@ -496,4 +496,53 @@
             </div>
             
             <p class="text-center text-2xl font-bold bg-white/20 border border-white/40 px-10 py-4 rounded-full shadow-2xl backdrop-blur-md inline-block mt-4 anim-element anim-fade-up delay-4">
-                <i class
+                <i class="fa-brands fa-instagram mr-2"></i> Prepare suas dúvidas e participe! <span class="font-black ml-1 text-white drop-shadow">#PositividadeUnibrisa</span>
+            </p>
+        </div>
+
+        <!-- ==========================================
+             CENA 10: TELA COM LOGO E MÚSICA DE FUNDO
+        =========================================== -->
+        <div id="scene-10" class="scene px-4 w-full text-center">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="absolute top-16 md:top-24 h-48 md:h-64 object-contain anim-element anim-zoom-in animate-pulse-slow drop-shadow-[0_0_40px_rgba(255,255,255,0.8)] mx-auto">
+        </div>
+
+    </div> <!-- FIM DO CONTEINER 16:9 -->
+
+    <!-- Script de Gestão das Cenas -->
+    <script>
+        let currentScene = 0;
+        const totalScenes = 11; 
+
+        function showScene(index) {
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+            // O delay pequeno permite que o CSS "reinicie" a animação
+            setTimeout(() => {
+                document.getElementById(`scene-${index}`).classList.add('active');
+            }, 50);
+        }
+
+        function nextScene(e) {
+            if(e) e.stopPropagation();
+            currentScene = (currentScene + 1) % totalScenes;
+            showScene(currentScene);
+        }
+
+        function prevScene(e) {
+            if(e) e.stopPropagation();
+            currentScene = (currentScene - 1 + totalScenes) % totalScenes;
+            showScene(currentScene);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                nextScene();
+            } else if (e.key === 'ArrowLeft') {
+                prevScene();
+            }
+        });
+    </script>
+</body>
+</html>
