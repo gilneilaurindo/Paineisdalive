@@ -43,8 +43,12 @@
     </script>
 
     <style>
+        /* O fundo agora é global para cobrir qualquer tamanho de monitor sem deixar bordas lisas */
         body { 
             background-color: #FF7E05; 
+            background-image: url('https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Plano%20de%20fundo.png');
+            background-size: cover;
+            background-position: center;
             color: white; 
             overflow: hidden; 
             margin: 0; 
@@ -57,7 +61,7 @@
             justify-content: center;
         }
         
-        /* O SEGREDO DO 16:9 + Imagem de Fundo Oficial Original */
+        /* O SEGREDO DO 16:9 - Container transparente, apenas limita a área útil do conteúdo */
         .viewport-16-9 {
             position: relative;
             width: 100vw;
@@ -65,19 +69,16 @@
             max-height: 100vh;
             max-width: 177.77vh; 
             overflow: hidden;
-            background-image: url('https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Plano%20de%20fundo.png');
-            background-size: cover;
-            background-position: center;
-            background-color: #FF7E05;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            /* Fundo removido daqui para criar uma fusão perfeita com o body (fullscreen) */
         }
 
-        /* Sobreposição clara original */
+        /* Sobreposição de pontos também aplicada de forma global (fixed) */
         .pattern-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
             background-size: 30px 30px;
             z-index: 0;
+            pointer-events: none;
         }
 
         /* Cartões com brilho original (Glassmorphism claro) */
@@ -146,10 +147,12 @@
 </head>
 <body class="antialiased font-sans">
 
-    <!-- CONTEINER 16:9 -->
+    <!-- Padrão de pontos em toda a tela -->
+    <div class="pattern-overlay"></div>
+
+    <!-- CONTEINER 16:9 (Área segura para o OBS) -->
     <div class="viewport-16-9">
         
-        <div class="pattern-overlay"></div>
         <div id="progress-bar"></div>
 
         <!-- ==========================================
@@ -169,10 +172,18 @@
             <i class="fa-solid fa-satellite-dish text-3xl"></i>
         </div>
 
-        <!-- Fundo decorativo flutuante -->
-        <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
-            <i class="fa-solid fa-podcast absolute top-[20%] left-[10%] text-9xl text-white animate-float"></i>
-            <i class="fa-solid fa-microchip absolute bottom-[30%] right-[10%] text-8xl text-white animate-float-delayed"></i>
+        <!-- Fundo decorativo flutuante com ícones focados em APRENDIZAGEM -->
+        <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-20">
+            <!-- Ícones originais -->
+            <i class="fa-solid fa-podcast absolute top-[20%] left-[8%] text-8xl text-white animate-float"></i>
+            <i class="fa-solid fa-microchip absolute bottom-[25%] right-[8%] text-8xl text-white animate-float-delayed"></i>
+            
+            <!-- Novos Ícones de Aprendizagem -->
+            <i class="fa-solid fa-graduation-cap absolute top-[15%] right-[25%] text-7xl text-white animate-pulse-slow"></i>
+            <i class="fa-solid fa-book-open-reader absolute bottom-[20%] left-[20%] text-8xl text-white animate-float"></i>
+            <i class="fa-solid fa-lightbulb absolute top-[45%] left-[5%] text-6xl text-white animate-float-delayed"></i>
+            <i class="fa-solid fa-brain absolute top-[35%] right-[4%] text-7xl text-white animate-spin-slow"></i>
+            <i class="fa-solid fa-chalkboard-user absolute bottom-[10%] right-[30%] text-6xl text-white animate-float"></i>
         </div>
 
         <!-- ÁREA DE CONTROLO MANUAL (Esquerda/Direita invisível) -->
