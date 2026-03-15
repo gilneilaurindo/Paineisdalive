@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telas Animadas 16:9 - Live Unibrisa (Loop Automático)</title>
+    <title>Telas Animadas 16:9 - Live Unibrisa (Mesa de Corte Interativa)</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -156,17 +156,17 @@
         <div id="progress-bar"></div>
 
         <!-- ==========================================
-             ELEMENTOS GLOBAIS (Sempre visíveis)
+             ELEMENTOS GLOBAIS (BOTÕES DA MESA DE CORTE)
         =========================================== -->
         
-        <!-- SÍMBOLO "AO VIVO" -->
-        <div class="absolute top-6 left-8 flex items-center gap-3 bg-red-600/90 px-6 py-2 rounded-full shadow-[0_0_20px_rgba(255,0,0,0.8)] border border-red-400/50 z-[100] backdrop-blur-sm">
+        <!-- BOTÃO 1: SÍMBOLO "AO VIVO" (Clica para ir para Capa da Live) -->
+        <div onclick="setMode('live')" class="absolute top-6 left-8 flex items-center gap-3 bg-red-600/90 px-6 py-2 rounded-full shadow-[0_0_20px_rgba(255,0,0,0.8)] border border-red-400/50 z-[100] backdrop-blur-sm cursor-pointer hover:scale-105 hover:bg-red-500 transition-all" title="Mostrar Capa Ao Vivo">
             <div class="w-4 h-4 bg-white rounded-full animate-ping-slow"></div>
             <span class="text-white font-black text-2xl tracking-[0.2em] uppercase drop-shadow-md">Ao Vivo</span>
         </div>
 
-        <!-- FAIXA ASSERTIVA "COMEÇAREMOS EM INSTANTES" / "INTERVALO" -->
-        <div id="global-ticker" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-brisa-blue text-white px-10 py-3 rounded-full shadow-[0_0_30px_rgba(34,66,212,0.8)] border-4 border-white z-[100] flex items-center gap-4 animate-pulse-slow w-max transition-colors duration-500">
+        <!-- BOTÃO 2: FAIXA INFERIOR (Clica para alternar entre Introdução e Intervalo) -->
+        <div id="global-ticker" onclick="toggleWaitMode()" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-brisa-blue text-white px-10 py-3 rounded-full shadow-[0_0_30px_rgba(34,66,212,0.8)] border-4 border-white z-[100] flex items-center gap-4 animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105" title="Alternar entre Pré-Live e Intervalo">
             <i class="fa-solid fa-satellite-dish text-3xl"></i>
             <span id="ticker-text" class="font-black text-3xl md:text-4xl uppercase tracking-widest">Começaremos em Instantes</span>
             <i class="fa-solid fa-satellite-dish text-3xl"></i>
@@ -186,37 +186,31 @@
             <i class="fa-solid fa-chalkboard-user absolute bottom-[10%] right-[30%] text-6xl text-white animate-float"></i>
         </div>
 
-        <!-- ÁREA DE CONTROLO MANUAL (Esquerda/Direita invisível) -->
+        <!-- ÁREA DE CONTROLO MANUAL (Esquerda/Direita invisível para mudar cena do loop) -->
         <div class="absolute inset-0 z-[60] flex pointer-events-none">
             <div onclick="prevScene(event)" class="w-[15%] h-full pointer-events-auto cursor-pointer"></div>
             <div onclick="nextScene(event)" class="w-[85%] h-full pointer-events-auto cursor-pointer"></div>
         </div>
 
         <!-- ==========================================
-             CENA 0: CAPA DE ESPERA PRINCIPAL
+             MODO INTRODUÇÃO (CENAS 0 a 5)
         =========================================== -->
         <div id="scene-0" class="scene active text-center px-4">
             <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-56 md:h-72 mb-4 object-contain anim-element anim-fade-up drop-shadow-[0_0_40px_rgba(255,255,255,0.9)] mx-auto animate-float">
-            
             <h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight text-white uppercase anim-element anim-tracking delay-1 glow-text drop-shadow-2xl">
                 O Futuro é Agora
             </h1>
-            
             <p class="text-4xl md:text-5xl font-black bg-white/20 border-2 border-white/40 px-12 py-4 rounded-full shadow-2xl backdrop-blur-md inline-block mt-8 anim-element anim-fade-up delay-2 uppercase text-white">
                 Positivação Unibrisa <span class="text-white drop-shadow-md">2026</span>
             </p>
         </div>
 
-        <!-- ==========================================
-             CENA 1: PROGRAMAÇÃO DE HOJE (A Agenda do Stream)
-        =========================================== -->
         <div id="scene-1" class="scene px-8 w-full">
             <div class="text-center mb-10 anim-element anim-fade-up">
                 <h2 class="font-heading font-black text-6xl md:text-7xl drop-shadow-lg text-white uppercase tracking-wider bg-black/30 inline-block px-10 py-3 rounded-2xl border border-white/20 backdrop-blur-md">
                     <i class="fa-solid fa-list-check mr-4 text-white"></i> Programação de Hoje
                 </h2>
             </div>
-            
             <div class="grid grid-cols-2 gap-8 max-w-7xl mx-auto anim-element anim-fade-up delay-1 w-full">
                 <!-- Coluna Manhã -->
                 <div class="glass-card p-6 border-l-8 border-l-white">
@@ -229,7 +223,6 @@
                         <li class="flex items-center gap-4"><span class="bg-white text-brisa-dark px-3 py-1 rounded-lg text-xl font-black">10:30</span> Compliance (Ética de Bolso)</li>
                     </ul>
                 </div>
-                
                 <!-- Coluna Tarde -->
                 <div class="glass-card p-6 border-l-8 border-l-brisa-dark">
                     <h3 class="text-4xl font-black mb-6 text-white uppercase border-b border-white/30 pb-3 flex items-center gap-3">
@@ -244,9 +237,6 @@
             </div>
         </div>
 
-        <!-- ==========================================
-             CENA 2: ABERTURA (Apresentadores)
-        =========================================== -->
         <div id="scene-2" class="scene px-4 w-full">
             <div class="text-center mb-8 anim-element anim-fade-up">
                 <span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Apresentação BrisaCast</span>
@@ -266,17 +256,12 @@
             </div>
         </div>
 
-        <!-- ==========================================
-             CENA 3: DESTAQUES DA MANHÃ (Cyber & Compliance)
-        =========================================== -->
         <div id="scene-3" class="scene px-4 w-full">
             <div class="text-center mb-8 anim-element anim-fade-up">
                 <span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Destaques da Manhã</span>
                 <h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Cibersegurança & Compliance</h2>
             </div>
-            
             <div class="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto anim-element anim-fade-up delay-1">
-                <!-- Grouping guests to keep it big and mobile friendly -->
                 <div class="glass-card p-4 w-52 flex flex-col items-center text-center">
                     <div class="w-24 h-24 rounded-full border-4 border-white mb-3 bg-white/20 flex items-center justify-center shadow-lg"><i class="fa-solid fa-user-shield text-4xl"></i></div>
                     <h3 class="text-xl font-bold leading-tight">Lucas<br>Kennedy</h3>
@@ -300,15 +285,11 @@
             </div>
         </div>
 
-        <!-- ==========================================
-             CENA 4: DESTAQUES DA TARDE (Google Cloud & Financ.)
-        =========================================== -->
         <div id="scene-4" class="scene px-4 w-full">
             <div class="text-center mb-8 anim-element anim-fade-up">
                 <span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Destaques da Tarde</span>
                 <h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Google Cloud & Educação Financeira</h2>
             </div>
-            
             <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto anim-element anim-fade-up delay-1">
                 <div class="glass-card p-5 w-56 flex flex-col items-center text-center">
                     <div class="w-28 h-28 rounded-full border-4 border-white mb-4 bg-white/20 flex items-center justify-center shadow-lg"><i class="fa-solid fa-cloud text-5xl"></i></div>
@@ -329,27 +310,19 @@
             </div>
         </div>
 
-        <!-- ==========================================
-             CENA 5: PREMIAÇÃO E QUIZZES (Hype Final)
-        =========================================== -->
         <div id="scene-5" class="scene text-center px-4">
             <i class="fa-solid fa-trophy text-9xl md:text-[180px] text-white drop-shadow-[0_0_50px_rgba(255,255,255,0.8)] mb-10 animate-float anim-element anim-fade-up"></i>
-            
             <h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight mb-6 drop-shadow-lg uppercase anim-element anim-fade-up delay-1 glow-text">
                 Fique até o final!
             </h1>
-            
             <p class="text-4xl font-bold drop-shadow mb-8 max-w-4xl text-center leading-relaxed mx-auto anim-element anim-fade-up delay-2">
                 Participe dos nossos <span class="bg-white text-brisa-dark px-4 py-1 rounded-xl shadow-md uppercase font-black mx-2">Quizzes</span> e concorra a prêmios incríveis!
             </p>
         </div>
 
         <!-- ==========================================
-             MODO INTERVALO (CENAS 6, 7 e 8)
-             (Estas cenas só rodam quando você aperta a tecla '2')
+             MODO INTERVALO (CENAS 6 a 8)
         =========================================== -->
-        
-        <!-- CENA 6: CAPA DO INTERVALO -->
         <div id="scene-6" class="scene px-4 w-full text-center flex flex-col items-center justify-center">
             <div class="w-40 h-40 bg-white/20 rounded-full flex items-center justify-center border-4 border-white mb-8 animate-float mx-auto shadow-2xl backdrop-blur-md anim-element anim-fade-up">
                 <i class="fa-solid fa-mug-hot text-7xl text-white"></i>
@@ -362,7 +335,6 @@
             </p>
         </div>
 
-        <!-- CENA 7: PROPAGANDA 1 (Universo Brisa) -->
         <div id="scene-7" class="scene px-4 w-full flex flex-col items-center justify-center">
             <div class="glass-card p-10 max-w-5xl w-full border-l-8 border-l-white flex items-center gap-10 anim-element anim-zoom-in">
                 <div class="text-left flex-1">
@@ -376,7 +348,6 @@
             </div>
         </div>
 
-        <!-- CENA 8: PROPAGANDA 2 (Embaixadoras) -->
         <div id="scene-8" class="scene px-4 w-full flex flex-col items-center justify-center">
             <div class="glass-card p-10 max-w-5xl w-full border-t-8 border-t-white text-center anim-element anim-fade-up">
                 <i class="fa-solid fa-bullhorn text-7xl text-white mb-6 animate-wiggle"></i>
@@ -386,20 +357,34 @@
             </div>
         </div>
 
+        <!-- ==========================================
+             MODO AO VIVO (CENA 9 - Nova Tela Estática)
+        =========================================== -->
+        <div id="scene-9" class="scene px-4 w-full text-center flex flex-col items-center justify-center">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-64 md:h-80 mb-8 object-contain anim-element anim-fade-up drop-shadow-[0_0_50px_rgba(255,255,255,0.9)] mx-auto animate-pulse-slow">
+            
+            <h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight text-white uppercase anim-element anim-tracking delay-1 glow-text drop-shadow-2xl">
+                Transmissão Ao Vivo
+            </h1>
+            
+            <p class="text-4xl font-bold drop-shadow mt-6 max-w-4xl mx-auto anim-element anim-fade-up delay-2">
+                Acompanhe o conteúdo e interaja enviando suas mensagens no chat!
+            </p>
+        </div>
+
     </div> <!-- FIM DO CONTEINER 16:9 -->
 
     <!-- Script de Gestão das Cenas (COM AUTO-PLAY E MESA DE CORTE) -->
     <script>
         let currentSceneIndex = 0;
         
-        // MODO INTRO (Antes de começar a live)
+        // Arrays de cenas para cada modo
         const introScenes = [0, 1, 2, 3, 4, 5];
-        
-        // MODO INTERVALO (Pausa para o café / Propagandas)
         const breakScenes = [6, 7, 8];
+        const liveScenes = [9]; // Modo Ao Vivo possui apenas 1 cena de capa
         
-        let activeScenes = introScenes; // Inicia no modo Intro
-        let currentMode = 'intro'; // 'intro' ou 'break'
+        let activeScenes = introScenes; 
+        let currentMode = 'intro'; 
         
         // TEMPO DE EXIBIÇÃO DE CADA TELA (4500ms = 4.5 segundos)
         const TIME_PER_SCENE = 4500; 
@@ -410,6 +395,12 @@
         const tickerText = document.getElementById('ticker-text');
 
         function startAutoPlay() {
+            // Se for modo "Ao Vivo" (Cena 9), não precisa de barra de progresso nem rodar loop
+            if (currentMode === 'live') {
+                progressBar.style.width = '0%';
+                return;
+            }
+
             progressBar.style.transition = 'none';
             progressBar.style.width = '0%';
             
@@ -433,7 +424,6 @@
                 scene.classList.remove('active');
             });
             
-            // Pega o ID real da cena baseada no array ativo (Intro ou Break)
             const realSceneId = activeScenes[index];
             
             setTimeout(() => {
@@ -445,55 +435,68 @@
             if(e) { e.stopPropagation(); resetAutoPlay(); } 
             else { startAutoPlay(); } 
             
-            currentSceneIndex = (currentSceneIndex + 1) % activeScenes.length;
+            // Se houver apenas 1 cena (ex: Modo Live), não precisa avançar o index
+            if (activeScenes.length > 1) {
+                currentSceneIndex = (currentSceneIndex + 1) % activeScenes.length;
+            }
             showScene(currentSceneIndex);
         }
 
         function prevScene(e) {
             if(e) { e.stopPropagation(); resetAutoPlay(); }
-            currentSceneIndex = (currentSceneIndex - 1 + activeScenes.length) % activeScenes.length;
+            if (activeScenes.length > 1) {
+                currentSceneIndex = (currentSceneIndex - 1 + activeScenes.length) % activeScenes.length;
+            }
             showScene(currentSceneIndex);
         }
         
-        // FUNÇÃO "MESA DE CORTE" (Alterna entre Introdução e Intervalo)
+        // FUNÇÃO TOGGLE PARA O BOTÃO INFERIOR (Muda entre INTRO e BREAK)
+        function toggleWaitMode() {
+            if (currentMode === 'intro' || currentMode === 'live') {
+                setMode('break'); // Vai para a Pausa do Café
+            } else {
+                setMode('intro'); // Volta para a Introdução
+            }
+        }
+
+        // FUNÇÃO "MESA DE CORTE" (Alterna entre os Modos)
         function setMode(mode) {
-            if(currentMode === mode) return; // Já está neste modo, ignora
+            if(currentMode === mode) return; 
             
             currentMode = mode;
-            currentSceneIndex = 0; // Volta pra primeira tela do modo selecionado
+            currentSceneIndex = 0; 
             
+            // Lógica de Cores e Comportamento dos Botões
             if(mode === 'intro') {
                 activeScenes = introScenes;
-                // Volta o Ticker para o esquema original (Azul e Branco)
-                globalTicker.className = "absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-brisa-blue text-white px-10 py-3 rounded-full shadow-[0_0_30px_rgba(34,66,212,0.8)] border-4 border-white z-[100] flex items-center gap-4 animate-pulse-slow w-max transition-colors duration-500";
+                globalTicker.className = "absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-brisa-blue text-white px-10 py-3 rounded-full shadow-[0_0_30px_rgba(34,66,212,0.8)] border-4 border-white z-[100] flex items-center gap-4 animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:bg-brisa-dark";
                 tickerText.innerText = "Começaremos em Instantes";
-            } else if(mode === 'break') {
+            } 
+            else if(mode === 'break') {
                 activeScenes = breakScenes;
-                // Muda o Ticker para branco com texto escuro, mantendo a identidade Unibrisa
-                globalTicker.className = "absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-white text-brisa-dark px-10 py-3 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.6)] border-4 border-brisa-dark z-[100] flex items-center gap-4 animate-pulse-slow w-max transition-colors duration-500";
-                tickerText.innerText = "Estamos no Intervalo • Retornaremos em Breve";
+                globalTicker.className = "absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-white text-brisa-dark px-10 py-3 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.6)] border-4 border-brisa-dark z-[100] flex items-center gap-4 animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105";
+                tickerText.innerText = "Pausa do Café • Retornamos em Breve";
+            }
+            else if(mode === 'live') {
+                activeScenes = liveScenes;
+                globalTicker.className = "absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-10 py-3 rounded-full shadow-[0_0_30px_rgba(255,0,0,0.8)] border-4 border-white z-[100] flex items-center gap-4 animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:bg-red-700";
+                tickerText.innerText = "Acompanhe nossa Transmissão";
             }
             
             resetAutoPlay();
             showScene(currentSceneIndex);
         }
 
-        // COMANDOS DE TECLADO PARA O STREAMER
+        // COMANDOS DE TECLADO
         document.addEventListener('keydown', (e) => {
-            // Setas direcionais para avançar/voltar no loop atual
             if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
                 nextScene(e); 
             } else if (e.key === 'ArrowLeft') {
                 prevScene(e);
             }
-            
-            // TECLAS MÁGICAS DA MESA DE CORTE
-            if (e.key === '1') {
-                setMode('intro'); // Pressione '1' para Loop Principal (Pré-Live)
-            }
-            if (e.key === '2') {
-                setMode('break'); // Pressione '2' para Loop de Propagandas (Intervalo do Café)
-            }
+            if (e.key === '1') setMode('intro'); // 1: Pré-Live
+            if (e.key === '2') setMode('break'); // 2: Pausa Café
+            if (e.key === '3') setMode('live');  // 3: Capa Ao Vivo
         });
 
         window.onload = () => {
