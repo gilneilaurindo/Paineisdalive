@@ -330,10 +330,12 @@
         =========================================== -->
         <div id="scene-6" class="scene px-4 w-full text-center flex flex-col items-center justify-center">
             <div class="w-40 h-40 bg-white/20 rounded-full flex items-center justify-center border-4 border-white mb-8 animate-float mx-auto shadow-2xl backdrop-blur-md anim-element anim-fade-up">
-                <i class="fa-solid fa-mug-hot text-7xl text-white"></i>
+                <!-- Ícone modificado de café para talheres (almoço) -->
+                <i class="fa-solid fa-utensils text-7xl text-white"></i>
             </div>
+            <!-- Título modificado para Pausa para Almoço -->
             <h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight text-white uppercase anim-element anim-fade-up delay-1 drop-shadow-2xl mb-6 glow-text">
-                Pausa Estratégica
+                Pausa para Almoço
             </h1>
             <p class="text-3xl font-bold drop-shadow max-w-4xl mx-auto anim-element anim-fade-up delay-2">
                 Aproveite para recarregar as energias. A transmissão retorna em breve!
@@ -450,7 +452,7 @@
         // FUNÇÃO TOGGLE PARA O BOTÃO INFERIOR (Muda entre INTRO e BREAK)
         function toggleWaitMode() {
             if (currentMode === 'intro' || currentMode === 'live') {
-                setMode('break'); // Vai para a Pausa do Café
+                setMode('break'); // Vai para a Pausa para Almoço
             } else {
                 setMode('intro'); // Volta para a Introdução
             }
@@ -474,7 +476,8 @@
                 activeScenes = breakScenes;
                 globalTicker.style.display = 'flex'; // Garante que a faixa apareça
                 globalTicker.className = "absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white/95 text-brisa-dark px-10 py-3.5 rounded-full shadow-[0_10px_40px_rgba(255,255,255,0.4)] border-2 border-brisa-dark/50 z-[100] flex items-center gap-5 backdrop-blur-md animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:border-brisa-dark";
-                tickerText.innerText = "Pausa do Café • Retornamos em Breve";
+                // Texto atualizado aqui
+                tickerText.innerText = "Pausa para Almoço • Retornamos em Breve";
             }
             else if(mode === 'live') {
                 activeScenes = liveScenes;
@@ -493,7 +496,7 @@
                 prevScene(e);
             }
             if (e.key === '1') setMode('intro'); // 1: Pré-Live
-            if (e.key === '2') setMode('break'); // 2: Pausa Café
+            if (e.key === '2') setMode('break'); // 2: Pausa Almoço
             if (e.key === '3') setMode('live');  // 3: Capa Ao Vivo
         });
 
