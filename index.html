@@ -1,508 +1,989 @@
 <!DOCTYPE html>
+
 <html lang="pt-PT">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telas Animadas 16:9 - Live Unibrisa (Mesa de Corte Interativa)</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome para Ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brisa: { orange: '#FF7E05', blue: '#2242D4', dark: '#1A34A8' }
-                    },
-                    fontFamily: { sans: ['Figtree', 'sans-serif'], heading: ['Figtree', 'sans-serif'] },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'float-delayed': 'float 6s ease-in-out 3s infinite',
-                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'spin-slow': 'spin-slow 15s linear infinite',
-                        'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        },
-                        'spin-slow': {
-                            '0%': { transform: 'rotate(0deg)' },
-                            '100%': { transform: 'rotate(360deg)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+<meta charset="UTF-8">
 
-    <style>
-        /* O fundo agora é global para cobrir qualquer tamanho de monitor sem deixar bordas lisas */
-        body { 
-            background-color: #FF7E05; 
-            background-image: url('https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Plano%20de%20fundo.png');
-            background-size: cover;
-            background-position: center;
-            color: white; 
-            overflow: hidden; 
-            margin: 0; 
-            padding: 0;
-            height: 100vh;
-            width: 100vw;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* O SEGREDO DO 16:9 - Container transparente, apenas limita a área útil do conteúdo */
-        .viewport-16-9 {
-            position: relative;
-            width: 100vw;
-            height: 56.25vw; 
-            max-height: 100vh;
-            max-width: 177.77vh; 
-            overflow: hidden;
-            /* Fundo removido daqui para criar uma fusão perfeita com o body (fullscreen) */
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        /* Sobreposição de pontos também aplicada de forma global (fixed) */
-        .pattern-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
-            background-size: 30px 30px;
-            z-index: 0;
-            pointer-events: none;
-        }
+<title>Telas Animadas 16:9 - Live Unibrisa (Mesa de Corte Interativa)</title>
 
-        /* Cartões com brilho original (Glassmorphism claro) */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); 
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 1.5rem; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s, background 0.3s;
-        }
-        
-        /* Gestão de Cenas */
-        .scene {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; z-index: 10;
-            transition: opacity 0.6s ease-in-out, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: scale(0.95);
-        }
-        .scene.active { 
-            opacity: 1; pointer-events: auto; transform: scale(1); 
-        }
 
-        /* --- ANIMAÇÕES DE TEXTO AVANÇADAS --- */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes trackingIn {
-            0% { letter-spacing: -0.5em; opacity: 0; filter: blur(10px); transform: scale(0.9); }
-            40% { opacity: 0.6; filter: blur(2px); }
-            100% { letter-spacing: normal; opacity: 1; filter: blur(0); transform: scale(1); }
-        }
-        @keyframes glowPulse {
-            0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-            50% { text-shadow: 0 0 30px rgba(255,255,255,0.9), 0 0 15px #FF7E05; }
-        }
 
-        .anim-element { opacity: 0; }
-        .scene.active .anim-fade-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .scene.active .anim-tracking { animation: trackingIn 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
-        
-        /* Delays */
-        .scene.active .delay-1 { animation-delay: 0.2s; }
-        .scene.active .delay-2 { animation-delay: 0.4s; }
-        .scene.active .delay-3 { animation-delay: 0.6s; }
-        
-        .glow-text { animation: glowPulse 3s infinite; }
-        .avatar-img { object-fit: cover; object-position: center; }
-        
-        /* Barra de Progresso do Loop */
-        #progress-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 8px;
-            background: linear-gradient(90deg, #2242D4, #ffffff, #FF7E05);
-            box-shadow: 0 0 15px rgba(255,255,255,0.8);
-            z-index: 100;
-            width: 0%;
-            transition: width linear;
-        }
-    </style>
+<!-- Tailwind CSS -->
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- FontAwesome para Ícones -->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Google Fonts -->
+
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+
+<script>
+
+tailwind.config = {
+
+theme: {
+
+extend: {
+
+colors: {
+
+brisa: { orange: '#FF7E05', blue: '#2242D4', dark: '#1A34A8' }
+
+},
+
+fontFamily: { sans: ['Figtree', 'sans-serif'], heading: ['Figtree', 'sans-serif'] },
+
+animation: {
+
+'float': 'float 6s ease-in-out infinite',
+
+'float-delayed': 'float 6s ease-in-out 3s infinite',
+
+'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+
+'spin-slow': 'spin-slow 15s linear infinite',
+
+'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+
+},
+
+keyframes: {
+
+float: {
+
+'0%, 100%': { transform: 'translateY(0)' },
+
+'50%': { transform: 'translateY(-20px)' },
+
+},
+
+'spin-slow': {
+
+'0%': { transform: 'rotate(0deg)' },
+
+'100%': { transform: 'rotate(360deg)' },
+
+}
+
+}
+
+}
+
+}
+
+}
+
+</script>
+
+
+
+<style>
+
+/* O fundo agora é global para cobrir qualquer tamanho de monitor sem deixar bordas lisas */
+
+body {
+
+background-color: #FF7E05;
+
+background-image: url('https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Plano%20de%20fundo.png');
+
+background-size: cover;
+
+background-position: center;
+
+color: white;
+
+overflow: hidden;
+
+margin: 0;
+
+padding: 0;
+
+height: 100vh;
+
+width: 100vw;
+
+user-select: none;
+
+display: flex;
+
+align-items: center;
+
+justify-content: center;
+
+}
+
+
+/* O SEGREDO DO 16:9 - Container transparente, apenas limita a área útil do conteúdo */
+
+.viewport-16-9 {
+
+position: relative;
+
+width: 100vw;
+
+height: 56.25vw;
+
+max-height: 100vh;
+
+max-width: 177.77vh;
+
+overflow: hidden;
+
+/* Fundo removido daqui para criar uma fusão perfeita com o body (fullscreen) */
+
+}
+
+
+
+/* Sobreposição de pontos também aplicada de forma global (fixed) */
+
+.pattern-overlay {
+
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+
+background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
+
+background-size: 30px 30px;
+
+z-index: 0;
+
+pointer-events: none;
+
+}
+
+
+
+/* Cartões com brilho original (Glassmorphism claro) */
+
+.glass-card {
+
+background: rgba(255, 255, 255, 0.1);
+
+backdrop-filter: blur(12px);
+
+-webkit-backdrop-filter: blur(12px);
+
+border: 2px solid rgba(255, 255, 255, 0.3);
+
+border-radius: 1.5rem;
+
+box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+transition: transform 0.3s, background 0.3s;
+
+}
+
+
+/* Gestão de Cenas */
+
+.scene {
+
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+
+opacity: 0; pointer-events: none; z-index: 10;
+
+transition: opacity 0.6s ease-in-out, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+transform: scale(0.95);
+
+}
+
+.scene.active {
+
+opacity: 1; pointer-events: auto; transform: scale(1);
+
+}
+
+
+
+/* --- ANIMAÇÕES DE TEXTO AVANÇADAS --- */
+
+@keyframes fadeInUp {
+
+from { opacity: 0; transform: translateY(40px); }
+
+to { opacity: 1; transform: translateY(0); }
+
+}
+
+@keyframes trackingIn {
+
+0% { letter-spacing: -0.5em; opacity: 0; filter: blur(10px); transform: scale(0.9); }
+
+40% { opacity: 0.6; filter: blur(2px); }
+
+100% { letter-spacing: normal; opacity: 1; filter: blur(0); transform: scale(1); }
+
+}
+
+@keyframes glowPulse {
+
+0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+
+50% { text-shadow: 0 0 30px rgba(255,255,255,0.9), 0 0 15px #FF7E05; }
+
+}
+
+
+
+.anim-element { opacity: 0; }
+
+.scene.active .anim-fade-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+.scene.active .anim-tracking { animation: trackingIn 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
+
+
+/* Delays */
+
+.scene.active .delay-1 { animation-delay: 0.2s; }
+
+.scene.active .delay-2 { animation-delay: 0.4s; }
+
+.scene.active .delay-3 { animation-delay: 0.6s; }
+
+
+.glow-text { animation: glowPulse 3s infinite; }
+
+.avatar-img { object-fit: cover; object-position: center; }
+
+
+/* Barra de Progresso do Loop */
+
+#progress-bar {
+
+position: absolute;
+
+bottom: 0;
+
+left: 0;
+
+height: 8px;
+
+background: linear-gradient(90deg, #2242D4, #ffffff, #FF7E05);
+
+box-shadow: 0 0 15px rgba(255,255,255,0.8);
+
+z-index: 100;
+
+width: 0%;
+
+transition: width linear;
+
+}
+
+</style>
+
 </head>
+
 <body class="antialiased font-sans">
 
-    <!-- Padrão de pontos em toda a tela -->
-    <div class="pattern-overlay"></div>
 
-    <!-- CONTEINER 16:9 (Área segura para o OBS) -->
-    <div class="viewport-16-9">
-        
-        <div id="progress-bar"></div>
 
-        <!-- ==========================================
-             ELEMENTOS GLOBAIS (BOTÕES DA MESA DE CORTE)
-        =========================================== -->
-        
-        <!-- BOTÃO 1: SÍMBOLO "AO VIVO" (Clica para ir para Capa da Live) -->
-        <div onclick="setMode('live')" class="absolute top-8 left-8 flex items-center gap-3 bg-gradient-to-r from-red-600 to-red-700 px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,0,0,0.6)] border border-red-400/50 z-[100] backdrop-blur-md cursor-pointer hover:scale-105 hover:from-red-500 hover:to-red-600 transition-all duration-300 group" title="Mostrar Capa Ao Vivo">
-            <div class="w-3.5 h-3.5 bg-white rounded-full animate-ping-slow group-hover:bg-red-100"></div>
-            <span class="text-white font-black text-xl tracking-[0.25em] uppercase drop-shadow-md">Ao Vivo</span>
-        </div>
+<!-- Padrão de pontos em toda a tela -->
 
-        <!-- BOTÃO 2: FAIXA INFERIOR (Clica para alternar entre Introdução e Intervalo) -->
-        <div id="global-ticker" onclick="toggleWaitMode()" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-brisa-blue to-brisa-dark text-white px-10 py-3.5 rounded-full shadow-[0_10px_40px_rgba(34,66,212,0.6)] border-2 border-white/40 z-[100] flex items-center gap-5 backdrop-blur-md animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:border-white/80" title="Alternar entre Pré-Live e Intervalo">
-            <i class="fa-solid fa-satellite-dish text-2xl opacity-90"></i>
-            <span id="ticker-text" class="font-black text-2xl md:text-3xl uppercase tracking-widest drop-shadow-md">Começaremos em Instantes</span>
-            <i class="fa-solid fa-satellite-dish text-2xl opacity-90"></i>
-        </div>
+<div class="pattern-overlay"></div>
 
-        <!-- Fundo decorativo flutuante com ícones focados em APRENDIZAGEM -->
-        <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-20">
-            <!-- Ícones originais -->
-            <i class="fa-solid fa-podcast absolute top-[20%] left-[8%] text-8xl text-white animate-float"></i>
-            <i class="fa-solid fa-microchip absolute bottom-[25%] right-[8%] text-8xl text-white animate-float-delayed"></i>
-            
-            <!-- Novos Ícones de Aprendizagem -->
-            <i class="fa-solid fa-graduation-cap absolute top-[15%] right-[25%] text-7xl text-white animate-pulse-slow"></i>
-            <i class="fa-solid fa-book-open-reader absolute bottom-[20%] left-[20%] text-8xl text-white animate-float"></i>
-            <i class="fa-solid fa-lightbulb absolute top-[45%] left-[5%] text-6xl text-white animate-float-delayed"></i>
-            <i class="fa-solid fa-brain absolute top-[35%] right-[4%] text-7xl text-white animate-spin-slow"></i>
-            <i class="fa-solid fa-chalkboard-user absolute bottom-[10%] right-[30%] text-6xl text-white animate-float"></i>
-        </div>
 
-        <!-- ÁREA DE CONTROLO MANUAL (Esquerda/Direita invisível para mudar cena do loop) -->
-        <div class="absolute inset-0 z-[60] flex pointer-events-none">
-            <div onclick="prevScene(event)" class="w-[15%] h-full pointer-events-auto cursor-pointer"></div>
-            <div onclick="nextScene(event)" class="w-[85%] h-full pointer-events-auto cursor-pointer"></div>
-        </div>
 
-        <!-- ==========================================
-             MODO INTRODUÇÃO (CENAS 0 a 5)
-        =========================================== -->
-        <div id="scene-0" class="scene active text-center px-4">
-            <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-56 md:h-72 mb-4 object-contain anim-element anim-fade-up drop-shadow-[0_0_40px_rgba(255,255,255,0.9)] mx-auto animate-float">
-            <h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight text-white uppercase anim-element anim-tracking delay-1 glow-text drop-shadow-2xl">
-                O Futuro é Agora
-            </h1>
-            <p class="text-4xl md:text-5xl font-black bg-white/20 border-2 border-white/40 px-12 py-4 rounded-full shadow-2xl backdrop-blur-md inline-block mt-8 anim-element anim-fade-up delay-2 uppercase text-white">
-                Positivação Unibrisa <span class="text-white drop-shadow-md">2026</span>
-            </p>
-        </div>
+<!-- CONTEINER 16:9 (Área segura para o OBS) -->
 
-        <div id="scene-1" class="scene px-8 w-full">
-            <div class="text-center mb-10 anim-element anim-fade-up">
-                <h2 class="font-heading font-black text-6xl md:text-7xl drop-shadow-lg text-white uppercase tracking-wider bg-black/30 inline-block px-10 py-3 rounded-2xl border border-white/20 backdrop-blur-md">
-                    <i class="fa-solid fa-list-check mr-4 text-white"></i> Programação de Hoje
-                </h2>
-            </div>
-            <div class="grid grid-cols-2 gap-8 max-w-7xl mx-auto anim-element anim-fade-up delay-1 w-full">
-                <!-- Coluna Manhã -->
-                <div class="glass-card p-6 border-l-8 border-l-white">
-                    <h3 class="text-4xl font-black mb-6 text-white uppercase border-b border-white/30 pb-3 flex items-center gap-3">
-                        <i class="fa-solid fa-sun text-white"></i> Manhã
-                    </h3>
-                    <ul class="space-y-6 text-2xl md:text-3xl font-bold text-white">
-                        <li class="flex items-center gap-4"><span class="bg-white text-brisa-dark px-3 py-1 rounded-lg text-xl font-black">08:45</span> Abertura & Embaixadores da Marca</li>
-                        <li class="flex items-center gap-4"><span class="bg-white text-brisa-dark px-3 py-1 rounded-lg text-xl font-black">09:30</span> Cibersegurança</li>
-                        <li class="flex items-center gap-4"><span class="bg-white text-brisa-dark px-3 py-1 rounded-lg text-xl font-black">10:30</span> Compliance (Ética de Bolso)</li>
-                    </ul>
-                </div>
-                <!-- Coluna Tarde -->
-                <div class="glass-card p-6 border-l-8 border-l-brisa-dark">
-                    <h3 class="text-4xl font-black mb-6 text-white uppercase border-b border-white/30 pb-3 flex items-center gap-3">
-                        <i class="fa-solid fa-cloud-sun text-white"></i> Tarde
-                    </h3>
-                    <ul class="space-y-6 text-2xl md:text-3xl font-bold text-white">
-                        <li class="flex items-center gap-4"><span class="bg-brisa-dark text-white px-3 py-1 rounded-lg text-xl font-black">13:30</span> Google Cloud (Workspace)</li>
-                        <li class="flex items-center gap-4"><span class="bg-brisa-dark text-white px-3 py-1 rounded-lg text-xl font-black">15:00</span> Educação Financeira</li>
-                        <li class="flex items-center gap-4"><span class="bg-brisa-dark text-white px-3 py-1 rounded-lg text-xl font-black">16:30</span> Quizzes & Encerramento</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+<div class="viewport-16-9">
 
-        <div id="scene-2" class="scene px-4 w-full">
-            <div class="text-center mb-8 anim-element anim-fade-up">
-                <span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Apresentação BrisaCast</span>
-                <h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Abertura & Visão Estratégica</h2>
-            </div>
-            <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto anim-element anim-fade-up delay-1">
-                <div class="glass-card p-6 w-64 flex flex-col items-center text-center">
-                    <img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-36 h-36 rounded-full border-4 border-white mb-4 avatar-img shadow-xl">
-                    <h3 class="text-2xl font-black leading-tight mb-2">Valcerlan<br>Almeida</h3>
-                    <span class="text-white font-bold text-lg uppercase tracking-widest mt-2 border-b-2 border-white pb-1">Facilitador</span>
-                </div>
-                <div class="glass-card p-6 w-64 flex flex-col items-center text-center">
-                    <img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-36 h-36 rounded-full border-4 border-white mb-4 avatar-img shadow-xl">
-                    <h3 class="text-2xl font-black leading-tight mb-2">Flavia<br>Paulino</h3>
-                    <span class="text-white font-bold text-lg uppercase tracking-widest mt-2 border-b-2 border-white pb-1">Facilitadora</span>
-                </div>
-            </div>
-        </div>
 
-        <div id="scene-3" class="scene px-4 w-full">
-            <div class="text-center mb-8 anim-element anim-fade-up">
-                <span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Destaques da Manhã</span>
-                <h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Cibersegurança & Compliance</h2>
-            </div>
-            <div class="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto anim-element anim-fade-up delay-1">
-                <div class="glass-card p-4 w-52 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Lucas%20Kennedy.jpeg" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
-                    <h3 class="text-xl font-bold leading-tight">Lucas<br>Kennedy</h3>
-                </div>
-                <div class="glass-card p-4 w-52 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/William%20Heller.jpeg" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
-                    <h3 class="text-xl font-bold leading-tight">William<br>Heller</h3>
-                </div>
-                <div class="glass-card p-4 w-52 flex flex-col items-center text-center">
-                    <img src="https://media.licdn.com/dms/image/v2/D4D03AQFIKz7KHsJb5Q/profile-displayphoto-shrink_100_100/B4DZdfQ3PDG8AU-/0/1749649946241?e=1774483200&v=beta&t=GcA4xKs-7bPxbC0_GroBDp1LQxsh2ygbImlMqdKTR-8" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg">
-                    <h3 class="text-xl font-bold leading-tight">David<br>Barreto</h3>
-                </div>
-                <div class="glass-card p-4 w-52 flex flex-col items-center text-center">
-                    <img src="https://media.licdn.com/dms/image/v2/D4D03AQECBC4zx8qwxg/profile-displayphoto-shrink_400_400/B4DZdfQIcyGYAk-/0/1749649754809?e=1774483200&v=beta&t=u6qSWIWaINt8l40BFz8wBrEJky4It0J2YrMf6ZOIlxs" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg">
-                    <h3 class="text-xl font-bold leading-tight">Juliana<br>Fernandes</h3>
-                </div>
-                <!-- Ua fa'aopoopo le ata fou o Luciana Paulo -->
-                <div class="glass-card p-4 w-52 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Luciana%20Paulo.jpeg" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
-                    <h3 class="text-xl font-bold leading-tight">Luciana<br>Paulo</h3>
-                </div>
-                <div class="glass-card p-4 w-52 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Jo%C3%A3o%20Paulo%20Ara%C3%BAjo.png" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
-                    <h3 class="text-xl font-bold leading-tight">João P.<br>Araújo</h3>
-                </div>
-            </div>
-        </div>
+<div id="progress-bar"></div>
 
-        <div id="scene-4" class="scene px-4 w-full">
-            <div class="text-center mb-8 anim-element anim-fade-up">
-                <span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Destaques da Tarde</span>
-                <h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Google Cloud & Educação Financeira</h2>
-            </div>
-            <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto anim-element anim-fade-up delay-1">
-                <div class="glass-card p-5 w-56 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Natan%20Valenciano.jpeg" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
-                    <h3 class="text-2xl font-bold leading-tight">Natan<br>Valenciano</h3>
-                </div>
-                <div class="glass-card p-5 w-56 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Igor%20Carolino.jpeg" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
-                    <h3 class="text-2xl font-bold leading-tight">Igor<br>Carolino</h3>
-                </div>
-                <div class="glass-card p-5 w-56 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/%C3%82ngelo%20Pessoa.jpeg" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
-                    <h3 class="text-2xl font-bold leading-tight">Ângelo<br>Pessoa</h3>
-                </div>
-                <div class="glass-card p-5 w-56 flex flex-col items-center text-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Rom%C3%A1rio%20Aquino.png" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
-                    <h3 class="text-2xl font-bold leading-tight">Romário<br>Aquino</h3>
-                </div>
-            </div>
-        </div>
 
-        <div id="scene-5" class="scene text-center px-4">
-            <i class="fa-solid fa-trophy text-9xl md:text-[180px] text-white drop-shadow-[0_0_50px_rgba(255,255,255,0.8)] mb-10 animate-float anim-element anim-fade-up"></i>
-            <h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight mb-6 drop-shadow-lg uppercase anim-element anim-fade-up delay-1 glow-text">
-                Fique até o final!
-            </h1>
-            <p class="text-4xl font-bold drop-shadow mb-8 max-w-4xl text-center leading-relaxed mx-auto anim-element anim-fade-up delay-2">
-                Participe dos nossos <span class="bg-white text-brisa-dark px-4 py-1 rounded-xl shadow-md uppercase font-black mx-2">Quizzes</span> e concorra a prêmios incríveis!
-            </p>
-        </div>
 
-        <!-- ==========================================
-             MODO INTERVALO (CENAS 6 a 8)
-        =========================================== -->
-        <div id="scene-6" class="scene px-4 w-full text-center flex flex-col items-center justify-center">
-            <div class="w-40 h-40 bg-white/20 rounded-full flex items-center justify-center border-4 border-white mb-8 animate-float mx-auto shadow-2xl backdrop-blur-md anim-element anim-fade-up">
-                <!-- Ícone modificado de café para talheres (almoço) -->
-                <i class="fa-solid fa-utensils text-7xl text-white"></i>
-            </div>
-            <!-- Título modificado para Pausa para Almoço -->
-            <h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight text-white uppercase anim-element anim-fade-up delay-1 drop-shadow-2xl mb-6 glow-text">
-                Pausa para Almoço
-            </h1>
-            <p class="text-3xl font-bold drop-shadow max-w-4xl mx-auto anim-element anim-fade-up delay-2">
-                Aproveite para recarregar as energias. A transmissão retorna em breve!
-            </p>
-        </div>
+<!-- ==========================================
 
-        <div id="scene-7" class="scene px-4 w-full flex flex-col items-center justify-center">
-            <div class="glass-card p-10 max-w-5xl w-full border-l-8 border-l-white flex items-center gap-10 anim-element anim-zoom-in">
-                <div class="text-left flex-1">
-                    <span class="bg-white text-brisa-dark font-black px-6 py-2 rounded-full text-xl shadow-lg uppercase tracking-wider inline-block mb-6">Acesse Agora</span>
-                    <h2 class="font-heading font-black text-6xl text-white mb-4 drop-shadow-md leading-tight">Conheça o<br>Universo Brisa</h2>
-                    <p class="text-2xl font-medium text-white/90">Sua plataforma completa de desenvolvimento. Acesse os cursos de Cibersegurança e Compliance!</p>
-                </div>
-                <div class="w-64 h-64 bg-white/10 rounded-full flex items-center justify-center border-4 border-white/50 animate-pulse-slow shadow-2xl flex-shrink-0">
-                    <i class="fa-solid fa-laptop-code text-[100px] text-white"></i>
-                </div>
-            </div>
-        </div>
+ELEMENTOS GLOBAIS (BOTÕES DA MESA DE CORTE)
 
-        <div id="scene-8" class="scene px-4 w-full flex flex-col items-center justify-center">
-            <div class="glass-card p-10 max-w-5xl w-full border-t-8 border-t-white text-center anim-element anim-fade-up">
-                <i class="fa-solid fa-bullhorn text-7xl text-white mb-6 animate-wiggle"></i>
-                <h2 class="font-heading font-black text-6xl text-white mb-6 drop-shadow-md">Campanha Embaixadores da Marca</h2>
-                <p class="text-3xl font-bold text-white mb-8">Participe e represente a marca Unibrisa no seu setor!</p>
-                <span class="bg-white text-brisa-dark font-black px-10 py-3.5 rounded-full text-xl shadow-[0_10px_30px_rgba(255,255,255,0.3)] uppercase tracking-wider inline-block hover:scale-105 transition-transform cursor-pointer border-2 border-transparent hover:border-brisa-dark/20">Saiba mais com seu gestor</span>
-            </div>
-        </div>
+=========================================== -->
 
-        <!-- ==========================================
-             MODO AO VIVO (CENA 9 - LOGO CENTRALIZADA)
-        =========================================== -->
-        <div id="scene-9" class="scene px-4 w-full text-center flex flex-col items-center justify-center">
-            <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-72 md:h-[450px] object-contain anim-element anim-fade-up drop-shadow-[0_0_60px_rgba(255,255,255,0.8)] mx-auto animate-float">
-        </div>
 
-    </div> <!-- FIM DO CONTEINER 16:9 -->
+<!-- BOTÃO 1: SÍMBOLO "AO VIVO" (Clica para ir para Capa da Live) -->
 
-    <!-- Script de Gestão das Cenas (COM AUTO-PLAY E MESA DE CORTE) -->
-    <script>
-        let currentSceneIndex = 0;
-        
-        // Arrays de cenas para cada modo
-        const introScenes = [0, 1, 2, 3, 4, 5];
-        const breakScenes = [6, 7, 8];
-        const liveScenes = [9]; // Modo Ao Vivo possui apenas 1 cena de capa
-        
-        let activeScenes = introScenes; 
-        let currentMode = 'intro'; 
-        
-        // TEMPO DE EXIBIÇÃO DE CADA TELA (4500ms = 4.5 segundos)
-        const TIME_PER_SCENE = 4500; 
-        
-        let autoPlayTimer;
-        const progressBar = document.getElementById('progress-bar');
-        const globalTicker = document.getElementById('global-ticker');
-        const tickerText = document.getElementById('ticker-text');
+<div onclick="setMode('live')" class="absolute top-8 left-8 flex items-center gap-3 bg-gradient-to-r from-red-600 to-red-700 px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,0,0,0.6)] border border-red-400/50 z-[100] backdrop-blur-md cursor-pointer hover:scale-105 hover:from-red-500 hover:to-red-600 transition-all duration-300 group" title="Mostrar Capa Ao Vivo">
 
-        function startAutoPlay() {
-            // Se for modo "Ao Vivo" (Cena 9), não precisa de barra de progresso nem rodar loop
-            if (currentMode === 'live') {
-                progressBar.style.width = '0%';
-                return;
-            }
+<div class="w-3.5 h-3.5 bg-white rounded-full animate-ping-slow group-hover:bg-red-100"></div>
 
-            progressBar.style.transition = 'none';
-            progressBar.style.width = '0%';
-            
-            setTimeout(() => {
-                progressBar.style.transition = `width ${TIME_PER_SCENE}ms linear`;
-                progressBar.style.width = '100%';
-            }, 50);
+<span class="text-white font-black text-xl tracking-[0.25em] uppercase drop-shadow-md">Ao Vivo</span>
 
-            autoPlayTimer = setTimeout(() => {
-                nextScene();
-            }, TIME_PER_SCENE);
-        }
+</div>
 
-        function resetAutoPlay() {
-            clearTimeout(autoPlayTimer);
-            startAutoPlay();
-        }
 
-        function showScene(index) {
-            document.querySelectorAll('.scene').forEach(scene => {
-                scene.classList.remove('active');
-            });
-            
-            const realSceneId = activeScenes[index];
-            
-            setTimeout(() => {
-                document.getElementById(`scene-${realSceneId}`).classList.add('active');
-            }, 50);
-        }
 
-        function nextScene(e) {
-            if(e) { e.stopPropagation(); resetAutoPlay(); } 
-            else { startAutoPlay(); } 
-            
-            // Se houver apenas 1 cena (ex: Modo Live), não precisa avançar o index
-            if (activeScenes.length > 1) {
-                currentSceneIndex = (currentSceneIndex + 1) % activeScenes.length;
-            }
-            showScene(currentSceneIndex);
-        }
+<!-- BOTÃO 2: FAIXA INFERIOR (Clica para alternar entre Introdução e Intervalo) -->
 
-        function prevScene(e) {
-            if(e) { e.stopPropagation(); resetAutoPlay(); }
-            if (activeScenes.length > 1) {
-                currentSceneIndex = (currentSceneIndex - 1 + activeScenes.length) % activeScenes.length;
-            }
-            showScene(currentSceneIndex);
-        }
-        
-        // FUNÇÃO TOGGLE PARA O BOTÃO INFERIOR (Muda entre INTRO e BREAK)
-        function toggleWaitMode() {
-            if (currentMode === 'intro' || currentMode === 'live') {
-                setMode('break'); // Vai para a Pausa para Almoço
-            } else {
-                setMode('intro'); // Volta para a Introdução
-            }
-        }
+<div id="global-ticker" onclick="toggleWaitMode()" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-brisa-blue to-brisa-dark text-white px-10 py-3.5 rounded-full shadow-[0_10px_40px_rgba(34,66,212,0.6)] border-2 border-white/40 z-[100] flex items-center gap-5 backdrop-blur-md animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:border-white/80" title="Alternar entre Pré-Live e Intervalo">
 
-        // FUNÇÃO "MESA DE CORTE" (Alterna entre os Modos)
-        function setMode(mode) {
-            if(currentMode === mode) return; 
-            
-            currentMode = mode;
-            currentSceneIndex = 0; 
-            
-            // Lógica de Cores e Comportamento dos Botões
-            if(mode === 'intro') {
-                activeScenes = introScenes;
-                globalTicker.style.display = 'flex'; // Garante que a faixa apareça
-                globalTicker.className = "absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-brisa-blue to-brisa-dark text-white px-10 py-3.5 rounded-full shadow-[0_10px_40px_rgba(34,66,212,0.6)] border-2 border-white/40 z-[100] flex items-center gap-5 backdrop-blur-md animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:border-white/80";
-                tickerText.innerText = "Começaremos em Instantes";
-            } 
-            else if(mode === 'break') {
-                activeScenes = breakScenes;
-                globalTicker.style.display = 'flex'; // Garante que a faixa apareça
-                globalTicker.className = "absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white/95 text-brisa-dark px-10 py-3.5 rounded-full shadow-[0_10px_40px_rgba(255,255,255,0.4)] border-2 border-brisa-dark/50 z-[100] flex items-center gap-5 backdrop-blur-md animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:border-brisa-dark";
-                // Texto atualizado aqui
-                tickerText.innerText = "Pausa para Almoço • Retornamos em Breve";
-            }
-            else if(mode === 'live') {
-                activeScenes = liveScenes;
-                globalTicker.style.display = 'none'; // Esconde a faixa completamente na tela Ao Vivo
-            }
-            
-            resetAutoPlay();
-            showScene(currentSceneIndex);
-        }
+<i class="fa-solid fa-satellite-dish text-2xl opacity-90"></i>
 
-        // COMANDOS DE TECLADO
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
-                nextScene(e); 
-            } else if (e.key === 'ArrowLeft') {
-                prevScene(e);
-            }
-            if (e.key === '1') setMode('intro'); // 1: Pré-Live
-            if (e.key === '2') setMode('break'); // 2: Pausa Almoço
-            if (e.key === '3') setMode('live');  // 3: Capa Ao Vivo
-        });
+<span id="ticker-text" class="font-black text-2xl md:text-3xl uppercase tracking-widest drop-shadow-md">Começaremos em Instantes</span>
 
-        window.onload = () => {
-            startAutoPlay();
-        }
-    </script>
+<i class="fa-solid fa-satellite-dish text-2xl opacity-90"></i>
+
+</div>
+
+
+
+<!-- Fundo decorativo flutuante com ícones focados em APRENDIZAGEM -->
+
+<div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-20">
+
+<!-- Ícones originais -->
+
+<i class="fa-solid fa-podcast absolute top-[20%] left-[8%] text-8xl text-white animate-float"></i>
+
+<i class="fa-solid fa-microchip absolute bottom-[25%] right-[8%] text-8xl text-white animate-float-delayed"></i>
+
+
+<!-- Novos Ícones de Aprendizagem -->
+
+<i class="fa-solid fa-graduation-cap absolute top-[15%] right-[25%] text-7xl text-white animate-pulse-slow"></i>
+
+<i class="fa-solid fa-book-open-reader absolute bottom-[20%] left-[20%] text-8xl text-white animate-float"></i>
+
+<i class="fa-solid fa-lightbulb absolute top-[45%] left-[5%] text-6xl text-white animate-float-delayed"></i>
+
+<i class="fa-solid fa-brain absolute top-[35%] right-[4%] text-7xl text-white animate-spin-slow"></i>
+
+<i class="fa-solid fa-chalkboard-user absolute bottom-[10%] right-[30%] text-6xl text-white animate-float"></i>
+
+</div>
+
+
+
+<!-- ÁREA DE CONTROLO MANUAL (Esquerda/Direita invisível para mudar cena do loop) -->
+
+<div class="absolute inset-0 z-[60] flex pointer-events-none">
+
+<div onclick="prevScene(event)" class="w-[15%] h-full pointer-events-auto cursor-pointer"></div>
+
+<div onclick="nextScene(event)" class="w-[85%] h-full pointer-events-auto cursor-pointer"></div>
+
+</div>
+
+
+
+<!-- ==========================================
+
+MODO INTRODUÇÃO (CENAS 0 a 5)
+
+=========================================== -->
+
+<div id="scene-0" class="scene active text-center px-4">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-56 md:h-72 mb-4 object-contain anim-element anim-fade-up drop-shadow-[0_0_40px_rgba(255,255,255,0.9)] mx-auto animate-float">
+
+<h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight text-white uppercase anim-element anim-tracking delay-1 glow-text drop-shadow-2xl">
+
+O Futuro é Agora
+
+</h1>
+
+<p class="text-4xl md:text-5xl font-black bg-white/20 border-2 border-white/40 px-12 py-4 rounded-full shadow-2xl backdrop-blur-md inline-block mt-8 anim-element anim-fade-up delay-2 uppercase text-white">
+
+Positivação Unibrisa <span class="text-white drop-shadow-md">2026</span>
+
+</p>
+
+</div>
+
+
+
+<div id="scene-1" class="scene px-8 w-full">
+
+<div class="text-center mb-10 anim-element anim-fade-up">
+
+<h2 class="font-heading font-black text-6xl md:text-7xl drop-shadow-lg text-white uppercase tracking-wider bg-black/30 inline-block px-10 py-3 rounded-2xl border border-white/20 backdrop-blur-md">
+
+<i class="fa-solid fa-list-check mr-4 text-white"></i> Programação de Hoje
+
+</h2>
+
+</div>
+
+<div class="grid grid-cols-2 gap-8 max-w-7xl mx-auto anim-element anim-fade-up delay-1 w-full">
+
+<!-- Coluna Manhã -->
+
+<div class="glass-card p-6 border-l-8 border-l-white">
+
+<h3 class="text-4xl font-black mb-6 text-white uppercase border-b border-white/30 pb-3 flex items-center gap-3">
+
+<i class="fa-solid fa-sun text-white"></i> Manhã
+
+</h3>
+
+<ul class="space-y-6 text-2xl md:text-3xl font-bold text-white">
+
+<li class="flex items-center gap-4"><span class="bg-white text-brisa-dark px-3 py-1 rounded-lg text-xl font-black">08:45</span> Abertura & Embaixadores da Marca</li>
+
+<li class="flex items-center gap-4"><span class="bg-white text-brisa-dark px-3 py-1 rounded-lg text-xl font-black">09:30</span> Cibersegurança</li>
+
+<li class="flex items-center gap-4"><span class="bg-white text-brisa-dark px-3 py-1 rounded-lg text-xl font-black">10:30</span> Compliance (Ética de Bolso)</li>
+
+</ul>
+
+</div>
+
+<!-- Coluna Tarde -->
+
+<div class="glass-card p-6 border-l-8 border-l-brisa-dark">
+
+<h3 class="text-4xl font-black mb-6 text-white uppercase border-b border-white/30 pb-3 flex items-center gap-3">
+
+<i class="fa-solid fa-cloud-sun text-white"></i> Tarde
+
+</h3>
+
+<ul class="space-y-6 text-2xl md:text-3xl font-bold text-white">
+
+<li class="flex items-center gap-4"><span class="bg-brisa-dark text-white px-3 py-1 rounded-lg text-xl font-black">13:30</span> Google Cloud (Workspace)</li>
+
+<li class="flex items-center gap-4"><span class="bg-brisa-dark text-white px-3 py-1 rounded-lg text-xl font-black">15:00</span> Educação Financeira</li>
+
+<li class="flex items-center gap-4"><span class="bg-brisa-dark text-white px-3 py-1 rounded-lg text-xl font-black">16:30</span> Quizzes & Encerramento</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="scene-2" class="scene px-4 w-full">
+
+<div class="text-center mb-8 anim-element anim-fade-up">
+
+<span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Apresentação BrisaCast</span>
+
+<h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Abertura & Visão Estratégica</h2>
+
+</div>
+
+<div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto anim-element anim-fade-up delay-1">
+
+<div class="glass-card p-6 w-64 flex flex-col items-center text-center">
+
+<img src="https://media.licdn.com/dms/image/v2/D4D03AQGv_DSBWURHIQ/profile-displayphoto-shrink_400_400/B4DZf0IZNQHkAo-/0/1752147531786?e=1774483200&v=beta&t=gAkyrqnM0eV-VILDWjBGzY5dfUz1KNAE0-v-zYJHumE" class="w-36 h-36 rounded-full border-4 border-white mb-4 avatar-img shadow-xl">
+
+<h3 class="text-2xl font-black leading-tight mb-2">Valcerlan<br>Almeida</h3>
+
+<span class="text-white font-bold text-lg uppercase tracking-widest mt-2 border-b-2 border-white pb-1">Facilitador</span>
+
+</div>
+
+<div class="glass-card p-6 w-64 flex flex-col items-center text-center">
+
+<img src="https://media.licdn.com/dms/image/v2/D4D03AQEa5bciQ1lbxA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680806397406?e=1774483200&v=beta&t=QaEpHy6y7NeTXC3CSCjYpse0Iry4Je_vHxKvim3vup8" class="w-36 h-36 rounded-full border-4 border-white mb-4 avatar-img shadow-xl">
+
+<h3 class="text-2xl font-black leading-tight mb-2">Flavia<br>Paulino</h3>
+
+<span class="text-white font-bold text-lg uppercase tracking-widest mt-2 border-b-2 border-white pb-1">Facilitadora</span>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="scene-3" class="scene px-4 w-full">
+
+<div class="text-center mb-8 anim-element anim-fade-up">
+
+<span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Destaques da Manhã</span>
+
+<h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Cibersegurança & Compliance</h2>
+
+</div>
+
+<div class="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto anim-element anim-fade-up delay-1">
+
+<div class="glass-card p-4 w-52 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Lucas%20Kennedy.jpeg" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
+
+<h3 class="text-xl font-bold leading-tight">Lucas<br>Kennedy</h3>
+
+</div>
+
+<div class="glass-card p-4 w-52 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/William%20Heller.jpeg" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
+
+<h3 class="text-xl font-bold leading-tight">William<br>Heller</h3>
+
+</div>
+
+<div class="glass-card p-4 w-52 flex flex-col items-center text-center">
+
+<img src="https://media.licdn.com/dms/image/v2/D4D03AQFIKz7KHsJb5Q/profile-displayphoto-shrink_100_100/B4DZdfQ3PDG8AU-/0/1749649946241?e=1774483200&v=beta&t=GcA4xKs-7bPxbC0_GroBDp1LQxsh2ygbImlMqdKTR-8" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg">
+
+<h3 class="text-xl font-bold leading-tight">David<br>Barreto</h3>
+
+</div>
+
+<div class="glass-card p-4 w-52 flex flex-col items-center text-center">
+
+<img src="https://media.licdn.com/dms/image/v2/D4D03AQECBC4zx8qwxg/profile-displayphoto-shrink_400_400/B4DZdfQIcyGYAk-/0/1749649754809?e=1774483200&v=beta&t=u6qSWIWaINt8l40BFz8wBrEJky4It0J2YrMf6ZOIlxs" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg">
+
+<h3 class="text-xl font-bold leading-tight">Juliana<br>Fernandes</h3>
+
+</div>
+
+<!-- Ua fa'aopoopo le ata fou o Luciana Paulo -->
+
+<div class="glass-card p-4 w-52 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Luciana%20Paulo.jpeg" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
+
+<h3 class="text-xl font-bold leading-tight">Luciana<br>Paulo</h3>
+
+</div>
+
+<div class="glass-card p-4 w-52 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Jo%C3%A3o%20Paulo%20Ara%C3%BAjo.png" class="w-24 h-24 rounded-full border-4 border-white mb-3 avatar-img shadow-lg object-cover">
+
+<h3 class="text-xl font-bold leading-tight">João P.<br>Araújo</h3>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="scene-4" class="scene px-4 w-full">
+
+<div class="text-center mb-8 anim-element anim-fade-up">
+
+<span class="bg-white text-brisa-dark font-black px-8 py-2 rounded-full text-2xl shadow-lg uppercase tracking-wider inline-block mb-4">Destaques da Tarde</span>
+
+<h2 class="font-heading font-black text-6xl mt-2 mb-2 drop-shadow-md">Google Cloud & Educação Financeira</h2>
+
+</div>
+
+<div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto anim-element anim-fade-up delay-1">
+
+<div class="glass-card p-5 w-56 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Natan%20Valenciano.jpeg" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
+
+<h3 class="text-2xl font-bold leading-tight">Natan<br>Valenciano</h3>
+
+</div>
+
+<div class="glass-card p-5 w-56 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Igor%20Carolino.jpeg" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
+
+<h3 class="text-2xl font-bold leading-tight">Igor<br>Carolino</h3>
+
+</div>
+
+<div class="glass-card p-5 w-56 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/%C3%82ngelo%20Pessoa.jpeg" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
+
+<h3 class="text-2xl font-bold leading-tight">Ângelo<br>Pessoa</h3>
+
+</div>
+
+<div class="glass-card p-5 w-56 flex flex-col items-center text-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Rom%C3%A1rio%20Aquino.png" class="w-28 h-28 rounded-full border-4 border-white mb-4 avatar-img shadow-lg object-cover">
+
+<h3 class="text-2xl font-bold leading-tight">Romário<br>Aquino</h3>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="scene-5" class="scene text-center px-4">
+
+<i class="fa-solid fa-trophy text-9xl md:text-[180px] text-white drop-shadow-[0_0_50px_rgba(255,255,255,0.8)] mb-10 animate-float anim-element anim-fade-up"></i>
+
+<h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight mb-6 drop-shadow-lg uppercase anim-element anim-fade-up delay-1 glow-text">
+
+Fique até o final!
+
+</h1>
+
+<p class="text-4xl font-bold drop-shadow mb-8 max-w-4xl text-center leading-relaxed mx-auto anim-element anim-fade-up delay-2">
+
+Participe dos nossos <span class="bg-white text-brisa-dark px-4 py-1 rounded-xl shadow-md uppercase font-black mx-2">Quizzes</span> e concorra a prêmios incríveis!
+
+</p>
+
+</div>
+
+
+
+<!-- ==========================================
+
+MODO INTERVALO (CENAS 6 a 8)
+
+=========================================== -->
+
+<div id="scene-6" class="scene px-4 w-full text-center flex flex-col items-center justify-center">
+
+<div class="w-40 h-40 bg-white/20 rounded-full flex items-center justify-center border-4 border-white mb-8 animate-float mx-auto shadow-2xl backdrop-blur-md anim-element anim-fade-up">
+
+<i class="fa-solid fa-mug-hot text-7xl text-white"></i>
+
+</div>
+
+<h1 class="font-heading font-black text-7xl md:text-8xl tracking-tight text-white uppercase anim-element anim-fade-up delay-1 drop-shadow-2xl mb-6 glow-text">
+
+Pausa Estratégica
+
+</h1>
+
+<p class="text-3xl font-bold drop-shadow max-w-4xl mx-auto anim-element anim-fade-up delay-2">
+
+Aproveite para recarregar as energias. A transmissão retorna em breve!
+
+</p>
+
+</div>
+
+
+
+<div id="scene-7" class="scene px-4 w-full flex flex-col items-center justify-center">
+
+<div class="glass-card p-10 max-w-5xl w-full border-l-8 border-l-white flex items-center gap-10 anim-element anim-zoom-in">
+
+<div class="text-left flex-1">
+
+<span class="bg-white text-brisa-dark font-black px-6 py-2 rounded-full text-xl shadow-lg uppercase tracking-wider inline-block mb-6">Acesse Agora</span>
+
+<h2 class="font-heading font-black text-6xl text-white mb-4 drop-shadow-md leading-tight">Conheça o<br>Universo Brisa</h2>
+
+<p class="text-2xl font-medium text-white/90">Sua plataforma completa de desenvolvimento. Acesse os cursos de Cibersegurança e Compliance!</p>
+
+</div>
+
+<div class="w-64 h-64 bg-white/10 rounded-full flex items-center justify-center border-4 border-white/50 animate-pulse-slow shadow-2xl flex-shrink-0">
+
+<i class="fa-solid fa-laptop-code text-[100px] text-white"></i>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="scene-8" class="scene px-4 w-full flex flex-col items-center justify-center">
+
+<div class="glass-card p-10 max-w-5xl w-full border-t-8 border-t-white text-center anim-element anim-fade-up">
+
+<i class="fa-solid fa-bullhorn text-7xl text-white mb-6 animate-wiggle"></i>
+
+<h2 class="font-heading font-black text-6xl text-white mb-6 drop-shadow-md">Campanha Embaixadores da Marca</h2>
+
+<p class="text-3xl font-bold text-white mb-8">Participe e represente a marca Unibrisa no seu setor!</p>
+
+<span class="bg-white text-brisa-dark font-black px-10 py-3.5 rounded-full text-xl shadow-[0_10px_30px_rgba(255,255,255,0.3)] uppercase tracking-wider inline-block hover:scale-105 transition-transform cursor-pointer border-2 border-transparent hover:border-brisa-dark/20">Saiba mais com seu gestor</span>
+
+</div>
+
+</div>
+
+
+
+<!-- ==========================================
+
+MODO AO VIVO (CENA 9 - LOGO CENTRALIZADA)
+
+=========================================== -->
+
+<div id="scene-9" class="scene px-4 w-full text-center flex flex-col items-center justify-center">
+
+<img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Logo%20Brisacast.png" alt="BrisaCast" class="h-72 md:h-[450px] object-contain anim-element anim-fade-up drop-shadow-[0_0_60px_rgba(255,255,255,0.8)] mx-auto animate-float">
+
+</div>
+
+
+
+</div> <!-- FIM DO CONTEINER 16:9 -->
+
+
+
+<!-- Script de Gestão das Cenas (COM AUTO-PLAY E MESA DE CORTE) -->
+
+<script>
+
+let currentSceneIndex = 0;
+
+
+// Arrays de cenas para cada modo
+
+const introScenes = [0, 1, 2, 3, 4, 5];
+
+const breakScenes = [6, 7, 8];
+
+const liveScenes = [9]; // Modo Ao Vivo possui apenas 1 cena de capa
+
+
+let activeScenes = introScenes;
+
+let currentMode = 'intro';
+
+
+// TEMPO DE EXIBIÇÃO DE CADA TELA (4500ms = 4.5 segundos)
+
+const TIME_PER_SCENE = 4500;
+
+
+let autoPlayTimer;
+
+const progressBar = document.getElementById('progress-bar');
+
+const globalTicker = document.getElementById('global-ticker');
+
+const tickerText = document.getElementById('ticker-text');
+
+
+
+function startAutoPlay() {
+
+// Se for modo "Ao Vivo" (Cena 9), não precisa de barra de progresso nem rodar loop
+
+if (currentMode === 'live') {
+
+progressBar.style.width = '0%';
+
+return;
+
+}
+
+
+
+progressBar.style.transition = 'none';
+
+progressBar.style.width = '0%';
+
+
+setTimeout(() => {
+
+progressBar.style.transition = `width ${TIME_PER_SCENE}ms linear`;
+
+progressBar.style.width = '100%';
+
+}, 50);
+
+
+
+autoPlayTimer = setTimeout(() => {
+
+nextScene();
+
+}, TIME_PER_SCENE);
+
+}
+
+
+
+function resetAutoPlay() {
+
+clearTimeout(autoPlayTimer);
+
+startAutoPlay();
+
+}
+
+
+
+function showScene(index) {
+
+document.querySelectorAll('.scene').forEach(scene => {
+
+scene.classList.remove('active');
+
+});
+
+
+const realSceneId = activeScenes[index];
+
+
+setTimeout(() => {
+
+document.getElementById(`scene-${realSceneId}`).classList.add('active');
+
+}, 50);
+
+}
+
+
+
+function nextScene(e) {
+
+if(e) { e.stopPropagation(); resetAutoPlay(); }
+
+else { startAutoPlay(); }
+
+
+// Se houver apenas 1 cena (ex: Modo Live), não precisa avançar o index
+
+if (activeScenes.length > 1) {
+
+currentSceneIndex = (currentSceneIndex + 1) % activeScenes.length;
+
+}
+
+showScene(currentSceneIndex);
+
+}
+
+
+
+function prevScene(e) {
+
+if(e) { e.stopPropagation(); resetAutoPlay(); }
+
+if (activeScenes.length > 1) {
+
+currentSceneIndex = (currentSceneIndex - 1 + activeScenes.length) % activeScenes.length;
+
+}
+
+showScene(currentSceneIndex);
+
+}
+
+
+// FUNÇÃO TOGGLE PARA O BOTÃO INFERIOR (Muda entre INTRO e BREAK)
+
+function toggleWaitMode() {
+
+if (currentMode === 'intro' || currentMode === 'live') {
+
+setMode('break'); // Vai para a Pausa do Café
+
+} else {
+
+setMode('intro'); // Volta para a Introdução
+
+}
+
+}
+
+
+
+// FUNÇÃO "MESA DE CORTE" (Alterna entre os Modos)
+
+function setMode(mode) {
+
+if(currentMode === mode) return;
+
+
+currentMode = mode;
+
+currentSceneIndex = 0;
+
+
+// Lógica de Cores e Comportamento dos Botões
+
+if(mode === 'intro') {
+
+activeScenes = introScenes;
+
+globalTicker.style.display = 'flex'; // Garante que a faixa apareça
+
+globalTicker.className = "absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-brisa-blue to-brisa-dark text-white px-10 py-3.5 rounded-full shadow-[0_10px_40px_rgba(34,66,212,0.6)] border-2 border-white/40 z-[100] flex items-center gap-5 backdrop-blur-md animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:border-white/80";
+
+tickerText.innerText = "Começaremos em Instantes";
+
+}
+
+else if(mode === 'break') {
+
+activeScenes = breakScenes;
+
+globalTicker.style.display = 'flex'; // Garante que a faixa apareça
+
+globalTicker.className = "absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white/95 text-brisa-dark px-10 py-3.5 rounded-full shadow-[0_10px_40px_rgba(255,255,255,0.4)] border-2 border-brisa-dark/50 z-[100] flex items-center gap-5 backdrop-blur-md animate-pulse-slow w-max transition-all duration-500 cursor-pointer hover:scale-105 hover:border-brisa-dark";
+
+tickerText.innerText = "Pausa do Café • Retornamos em Breve";
+
+}
+
+else if(mode === 'live') {
+
+activeScenes = liveScenes;
+
+globalTicker.style.display = 'none'; // Esconde a faixa completamente na tela Ao Vivo
+
+}
+
+
+resetAutoPlay();
+
+showScene(currentSceneIndex);
+
+}
+
+
+
+// COMANDOS DE TECLADO
+
+document.addEventListener('keydown', (e) => {
+
+if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+
+nextScene(e);
+
+} else if (e.key === 'ArrowLeft') {
+
+prevScene(e);
+
+}
+
+if (e.key === '1') setMode('intro'); // 1: Pré-Live
+
+if (e.key === '2') setMode('break'); // 2: Pausa Café
+
+if (e.key === '3') setMode('live'); // 3: Capa Ao Vivo
+
+});
+
+
+
+window.onload = () => {
+
+startAutoPlay();
+
+}
+
+</script>
+
 </body>
+
 </html>
+
